@@ -1,0 +1,6 @@
+[
+{
+  "directory": "H:\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\main.cpp.obj", "src\\main.cpp"],
+  "file": "src\\main.cpp"
+}]
