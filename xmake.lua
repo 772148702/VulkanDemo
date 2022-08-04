@@ -8,7 +8,7 @@ include_dir_list = {
 }
 
 links_list={}
-add_defines("PLATFORM_WINDOWS")
+add_defines("PLATFORM_WINDOWS","NOMINMAX")
 target("Vulkan")
     add_files("./src/**.cpp")
     add_includedirs(include_dir_list, "$(projectdir)/src")
