@@ -3,7 +3,10 @@
 #include <memory>
 #include <string.h>
 
+#include "Common/Common.h"
 #include "Common/Log.h"
+#include "vulkan/vulkan_core.h"
+
 
 #define VULKAN_CPU_ALLOCATOR nullptr
 

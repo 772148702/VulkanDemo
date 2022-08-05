@@ -1,36 +1,91 @@
 [
 {
   "directory": "H:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Application\\GenericWindow.cpp.obj", "src\\Application\\GenericWindow.cpp"],
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Application\\Application.cpp.obj", "src\\Application\\Application.cpp"],
+  "file": "src\\Application\\Application.cpp"
+},
+{
+  "directory": "H:\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Application\\GenericApplication.cpp.obj", "src\\Application\\GenericApplication.cpp"],
+  "file": "src\\Application\\GenericApplication.cpp"
+},
+{
+  "directory": "H:\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Application\\GenericWindow.cpp.obj", "src\\Application\\GenericWindow.cpp"],
   "file": "src\\Application\\GenericWindow.cpp"
 },
 {
   "directory": "H:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\main.cpp.obj", "src\\main.cpp"],
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Core\\PixelFormat.cpp.obj", "src\\Core\\PixelFormat.cpp"],
+  "file": "src\\Core\\PixelFormat.cpp"
+},
+{
+  "directory": "H:\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine.cpp.obj", "src\\Engine.cpp"],
+  "file": "src\\Engine.cpp"
+},
+{
+  "directory": "H:\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\GenericPlatform\\InputManager.cpp.obj", "src\\GenericPlatform\\InputManager.cpp"],
+  "file": "src\\GenericPlatform\\InputManager.cpp"
+},
+{
+  "directory": "H:\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\GenericPlatform\\Windows\\InputManagerWindows.cpp.obj", "src\\GenericPlatform\\Windows\\InputManagerWindows.cpp"],
+  "file": "src\\GenericPlatform\\Windows\\InputManagerWindows.cpp"
+},
+{
+  "directory": "H:\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\GenericPlatform\\Windows\\WindowsPlatformTime.cpp.obj", "src\\GenericPlatform\\Windows\\WindowsPlatformTime.cpp"],
+  "file": "src\\GenericPlatform\\Windows\\WindowsPlatformTime.cpp"
+},
+{
+  "directory": "H:\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\main.cpp.obj", "src\\main.cpp"],
   "file": "src\\main.cpp"
 },
 {
   "directory": "H:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Math\\Color.cpp.obj", "src\\Math\\Color.cpp"],
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Math\\Color.cpp.obj", "src\\Math\\Color.cpp"],
   "file": "src\\Math\\Color.cpp"
 },
 {
   "directory": "H:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Math\\GenericPlatformMath.cpp.obj", "src\\Math\\GenericPlatformMath.cpp"],
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Math\\GenericPlatformMath.cpp.obj", "src\\Math\\GenericPlatformMath.cpp"],
   "file": "src\\Math\\GenericPlatformMath.cpp"
 },
 {
   "directory": "H:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Math\\Math.cpp.obj", "src\\Math\\Math.cpp"],
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Math\\Math.cpp.obj", "src\\Math\\Math.cpp"],
   "file": "src\\Math\\Math.cpp"
 },
 {
   "directory": "H:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Vulkan\\VulkanRHI.cpp.obj", "src\\Vulkan\\VulkanRHI.cpp"],
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Utils\\Crc.cpp.obj", "src\\Utils\\Crc.cpp"],
+  "file": "src\\Utils\\Crc.cpp"
+},
+{
+  "directory": "H:\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Utils\\SecureHash.cpp.obj", "src\\Utils\\SecureHash.cpp"],
+  "file": "src\\Utils\\SecureHash.cpp"
+},
+{
+  "directory": "H:\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Vulkan\\VulkanDevice.cpp.obj", "src\\Vulkan\\VulkanDevice.cpp"],
+  "file": "src\\Vulkan\\VulkanDevice.cpp"
+},
+{
+  "directory": "H:\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Vulkan\\VulkanMemory.cpp.obj", "src\\Vulkan\\VulkanMemory.cpp"],
+  "file": "src\\Vulkan\\VulkanMemory.cpp"
+},
+{
+  "directory": "H:\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Vulkan\\VulkanRHI.cpp.obj", "src\\Vulkan\\VulkanRHI.cpp"],
   "file": "src\\Vulkan\\VulkanRHI.cpp"
 },
 {
   "directory": "H:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Vulkan\\Windows\\VulkanWindowsPlatform.cpp.obj", "src\\Vulkan\\Windows\\VulkanWindowsPlatform.cpp"],
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/IH:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IH:\\VulkanDemo\\src", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DNDEBUG", "/Foh:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Vulkan\\Windows\\VulkanWindowsPlatform.cpp.obj", "src\\Vulkan\\Windows\\VulkanWindowsPlatform.cpp"],
   "file": "src\\Vulkan\\Windows\\VulkanWindowsPlatform.cpp"
 }]
