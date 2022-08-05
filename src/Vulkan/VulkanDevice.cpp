@@ -1,4 +1,5 @@
 #include "VulkanDevice.h"
+#include "Common/Log.h"
 #include "VulkanPlatform.h"
 #include "VulkanGlobals.h"
 #include "VulkanFence.h"
@@ -33,5 +34,17 @@ VulkanDevice::~VulkanDevice()
 
 void VulkanDevice::CreateDevice()
 {
-    
+   	bool debugMarkersFound = false;
+	std::vector<const char*> deviceExtensions;
+	std::vector<const char*> validationLayers;
+    GetDeviceExtensionsAndLayers(deviceExtensions, validationLayers, debugMarkersFound);
+    if(m_AppDeviceExtensions.size()>0)
+    {
+      	MLOG("Using app device extensions");
+        for (int32 i = 0; i < m_AppDeviceExtensions.size(); ++i)
+		{
+			deviceExtensions.push_back(m_AppDeviceExtensions[i]);
+			MLOG("* %s", m_AppDeviceExtensions[i]);
+		}
+    }
 }
