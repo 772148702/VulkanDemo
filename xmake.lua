@@ -7,7 +7,7 @@ include_dir_list = {
   "$(projectdir)/external/vulkan/windows/include"
 }
 
-links_list={}
+links_list={"User32","Gdi32"}
 add_defines("PLATFORM_WINDOWS","NOMINMAX")
 target("Vulkan")
     add_files("./src/**.cpp")
