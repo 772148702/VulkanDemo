@@ -166,3 +166,38 @@ VulkanSemaphore::~VulkanSemaphore()
 	}
 	vkDestroySemaphore(m_Device->GetInstanceHandle(), m_VkSemaphore, VULKAN_CPU_ALLOCATOR);
 }
+
+
+
+VulkanResourceSubAllocation::VulkanResourceSubAllocation(uint32 requestedSize, uint32 alignedOffset, uint32 allocationSize, uint32 allocationOffset)
+    : m_RequestedSize(requestedSize)
+    , m_AlignedOffset(alignedOffset)
+    , m_AllocationSize(allocationSize)
+    , m_AllocationOffset(allocationOffset)
+{
+    
+}
+
+VulkanResourceSubAllocation::~VulkanResourceSubAllocation()
+{
+    
+}
+
+
+VulkanBufferSubAllocation::VulkanBufferSubAllocation(VulkanSubBufferAllocator* owner, VkBuffer handle, uint32 requestedSize, uint32 alignedOffset, uint32 allocationSize, uint32 allocationOffset)
+    : VulkanResourceSubAllocation(requestedSize, alignedOffset, allocationSize, allocationOffset)
+    , m_Owner(owner)
+    , m_Handle(handle)
+{
+    
+}
+
+VulkanBufferSubAllocation::~VulkanBufferSubAllocation()
+{
+    m_Owner->Release(this);
+}
+
+void* VulkanBufferSubAllocation::GetMappedPointer()
+{
+    return (uint8*)m_Owner->GetMappedPointer() + m_AlignedOffset;
+}

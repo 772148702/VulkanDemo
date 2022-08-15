@@ -48,3 +48,32 @@ void VulkanDevice::CreateDevice()
 		}
     }
 }
+
+void VulkanDevice::Destroy()
+{
+    m_FenceManager->Destory();
+    delete m_FenceManager;
+
+    m_MemoryManager->Destory();
+    delete m_MemoryManager;
+
+    vkDestroyDevice(m_Device,VULKAN_CPU_ALLOCATOR);
+    m_Device = VK_NULL_HANDLE;
+
+}
+
+
+void VulkanDevice::InitGPU(int32 deviceIndex)
+{
+    vkGetPhysicalDeviceFeatures(m_PhysicalDevice,&m_PhysicalDeviceFeatures);
+    MLOG("Using Device %d: Geometry %d Tessellation %d", deviceIndex, m_PhysicalDeviceFeatures.geometryShader, m_PhysicalDeviceFeatures.tessellationShader);
+
+    CreateDevice();
+	SetupFormats();
+    
+    m_MemoryManager = new VulkanDeviceMemoryManager();
+    m_MemoryManager->Init(this);
+    
+    m_FenceManager = new VulkanFenceManager();
+	m_FenceManager->Init(this);
+}
