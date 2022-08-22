@@ -1,10 +1,13 @@
 #include "VulkanDevice.h"
+#include "Common/Common.h"
 #include "Common/Log.h"
 #include "VulkanPlatform.h"
 #include "VulkanGlobals.h"
 #include "VulkanFence.h"
 #include "Application/Application.h"
 #include "vulkan/vulkan_core.h"
+#include <string>
+#include <vector>
 
 
 VulkanDevice::VulkanDevice(VkPhysicalDevice physicalDevice)
@@ -77,3 +80,6 @@ void VulkanDevice::InitGPU(int32 deviceIndex)
     m_FenceManager = new VulkanFenceManager();
 	m_FenceManager->Init(this);
 }
+
+
+

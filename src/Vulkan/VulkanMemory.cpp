@@ -460,3 +460,51 @@ void VulkanDeviceMemoryAllocation::Unmap()
 }
 
 
+VulkanResourceHeapPage::VulkanResourceHeapPage(VulkanResourceHeap* owner, VulkanDeviceMemoryAllocation* deviceMemoryAllocation, uint32 id):
+m_Owner(owner),m_DeviceMemoryAllocation(deviceMemoryAllocation),m_MaxSize(0),m_UsedSize(0),m_PeakNumAllocations(0),m_FrameFreed(0),m_ID(id)
+{
+    m_MaxSize = (uint32)m_DeviceMemoryAllocation->GetSize();
+    VulkanRange fullRange;
+    fullRange.offset = 0;
+    fullRange.size = m_MaxSize;
+    m_FreeList.push_back(fullRange);
+}
+
+VulkanResourceHeapPage::~VulkanResourceHeapPage()
+{
+    if(m_DeviceMemoryAllocation==nullptr)
+    {
+        MLOGE("Device memory allocation is null.");
+    }
+}
+
+void VulkanResourceHeapPage::ReleaseAllocation(VulkanResourceAllocation* allocation)
+{
+    auto it = std::find(m_ResourceAllocations.begin(),m_ResourceAllocations.end(),allocation);
+    if(it!=m_ResourceAllocations.end())
+    {
+        m_ResourceAllocations.erase(it);
+        VulkanRange newFree;
+        newFree.offset = allocation->m_AllocationOffset;
+        newFree.size = allocation->m_AllocationSize;
+        m_FreeList.push_back(newFree);
+    }
+
+    m_UsedSize -=   allocation->m_AllocationSize;
+    if(m_UsedSize<0)
+    {
+        MLOGE("Used size less than zero.");
+    }
+
+    if (JoinFreeBlocks()) 
+    {
+        m_Owner->FreePage(this);
+    }
+}
+
+
+VulkanResourceAllocation* VulkanResourceHeapPage::TryAllocate(uint32 size, uint32 alignment, const char* file, uint32 line)
+{
+    
+}
+
