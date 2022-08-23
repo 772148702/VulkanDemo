@@ -1023,3 +1023,28 @@ VulkanResourceAllocation* VulkanResourceHeapManager::AllocateBufferMemory(const 
 
     return allocation;
 }
+
+
+VulkanResourceAllocation* VulkanResourceHeapManager::AllocateImageMemory(const VkMemoryRequirements &memoryReqs, VkMemoryPropertyFlags memoryPropertyFlags, const char *file, uint32 line)
+{
+    uint32 typeIndex=0;
+    VERIFYVULKANRESULT(m_DeviceMemoryManager->GetMemoryTypeFromProperties(memoryReqs.memoryTypeBits,memoryPropertyFlags, &typeIndex));
+    bool canMapped = (memoryPropertyFlags&VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)==VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+
+    if(!m_ResourceTypeHeaps[typeIndex])
+    {
+      MLOG("Missing memory type index %d, MemSize %d, MemPropTypeBits %u, MemPropertyFlags %u, %s(%d)", typeIndex, (uint32)memoryReqs.size, (uint32)memoryReqs.memoryTypeBits, (uint32)memoryPropertyFlags, file, line);
+    }
+
+    VulkanResourceAllocation* allocation = m_ResourceTypeHeaps[typeIndex]->AllocateResource(VulkanResourceHeap::Type::Image, uint32(memoryReqs.size), uint32(memoryReqs.alignment), canMapped, file, line);
+
+    if (!allocation)
+    {
+        VERIFYVULKANRESULT(m_DeviceMemoryManager->GetMemoryTypeFromPropertiesExcluding(memoryReqs.memoryTypeBits, memoryPropertyFlags, typeIndex, &typeIndex));
+        canMapped  = (memoryPropertyFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT) == VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+        allocation = m_ResourceTypeHeaps[typeIndex]->AllocateResource(VulkanResourceHeap::Type::Image, uint32(memoryReqs.size), uint32(memoryReqs.alignment), canMapped, file, line);
+    }
+    
+    return allocation;
+
+}
