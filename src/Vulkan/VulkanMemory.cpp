@@ -2,10 +2,14 @@
 #include "Common/Log.h"
 #include "Math/Math.h"
 #include "Utils/Alignment.h"
+#include "Vulkan/VulkanGlobals.h"
 #include "VulkanDevice.h"
 #include "VulkanMemory.h"
+#include "vulkan/vulkan_core.h"
 #include <algorithm>
+#include <cstddef>
 #include <stdint.h>
+#include <vector>
 
 
 enum
@@ -17,6 +21,7 @@ enum
 
    
 // VulkanRange
+//merge ranges to one range
 void VulkanRange::JoinConsecutiveRanges(std::vector<VulkanRange>& ranges)
 {
     if (ranges.size() == 0) {
@@ -142,8 +147,6 @@ void VulkanDeviceMemoryManager::Destory()
 }
 
 
-
-
 bool VulkanDeviceMemoryManager::SupportsMemoryType(VkMemoryPropertyFlags properties) const
 {
     for(uint32 index=0;index<m_MemoryProperties.memoryTypeCount;++index)
@@ -155,6 +158,117 @@ bool VulkanDeviceMemoryManager::SupportsMemoryType(VkMemoryPropertyFlags propert
     }
     return false;
 }
+
+VulkanDeviceMemoryAllocation* VulkanDeviceMemoryManager::Alloc(bool canFail, VkDeviceSize allocationSize, uint32 memoryTypeIndex, void* dedicatedAllocateInfo, const char* file, uint32 line)
+{
+    VkMemoryAllocateInfo allocInfo;
+    ZeroVulkanStruct(allocInfo, VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO);
+    allocInfo.allocationSize = allocationSize;
+    allocInfo.memoryTypeIndex = memoryTypeIndex;
+    allocInfo.pNext = dedicatedAllocateInfo;
+
+    VulkanDeviceMemoryAllocation* newAllocation = new VulkanDeviceMemoryAllocation();
+    newAllocation->m_Device =  m_DeviceHandle;
+    newAllocation->m_Size = allocationSize;
+    newAllocation->m_MemoryTypeIndex = memoryTypeIndex;
+    newAllocation->m_CanBeMapped     = ((m_MemoryProperties.memoryTypes[memoryTypeIndex].propertyFlags & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)  == VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+    newAllocation->m_IsCoherent      = ((m_MemoryProperties.memoryTypes[memoryTypeIndex].propertyFlags & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) == VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+    newAllocation->m_IsCached        = ((m_MemoryProperties.memoryTypes[memoryTypeIndex].propertyFlags & VK_MEMORY_PROPERTY_HOST_CACHED_BIT)   == VK_MEMORY_PROPERTY_HOST_CACHED_BIT);
+
+    VkResult  result = vkAllocateMemory(m_DeviceHandle, &allocInfo,VULKAN_CPU_ALLOCATOR,&newAllocation->m_Handle);
+
+    if(result==VK_ERROR_OUT_OF_DEVICE_MEMORY)
+    {
+        if(canFail)
+        {
+            MLOG("Failed to allocate Device Memory, Requested=%fKb MemTypeIndex=%d", (float)allocInfo.allocationSize / 1024.0f, allocInfo.memoryTypeIndex);
+            return nullptr;
+        }
+        MLOG("Out of Device Memory, Requested=%fKb MemTypeIndex=%d", (float)allocInfo.allocationSize / 1024.0f, allocInfo.memoryTypeIndex);
+#if MONKEY_DEBUG
+        DumpMemory();
+#endif
+    } else if(result==VK_ERROR_OUT_OF_HOST_MEMORY)
+    {
+        if (canFail)
+        {
+            MLOG("Failed to allocate Host Memory, Requested=%fKb MemTypeIndex=%d", (float)allocInfo.allocationSize / 1024.0f, allocInfo.memoryTypeIndex);
+            return nullptr;
+        }
+        MLOG("Out of Host Memory, Requested=%fKb MemTypeIndex=%d", (float)allocInfo.allocationSize / 1024.0f, allocInfo.memoryTypeIndex);
+#if MONKEY_DEBUG
+        DumpMemory();
+#endif
+    } else
+    {
+        VERIFYVULKANRESULT(result);
+    }
+    m_NumAllocations     += 1;
+    m_PeakNumAllocations = MMath::Max(m_NumAllocations, m_PeakNumAllocations);
+    if (m_NumAllocations == m_Device->GetLimits().maxMemoryAllocationCount) {
+        MLOGE("Hit Maximum # of allocations (%d) reported by device!", m_NumAllocations);
+    }
+
+    uint32 heapIndex = m_MemoryProperties.memoryTypes[memoryTypeIndex].heapIndex;
+    m_HeapInfos[heapIndex].allocations.push_back(newAllocation);
+    m_HeapInfos[heapIndex].usedSize += allocationSize;
+    m_HeapInfos[heapIndex].peakSize = MMath::Max(m_HeapInfos[heapIndex].peakSize, m_HeapInfos[heapIndex].usedSize);
+    
+    return newAllocation;
+}
+
+void VulkanDeviceMemoryManager::Free(VulkanDeviceMemoryAllocation*& allocation)
+{
+    m_NumAllocations -=1;
+    vkFreeMemory(m_DeviceHandle,allocation->m_Handle, VULKAN_CPU_ALLOCATOR);
+    uint32 heapIndex = m_MemoryProperties.memoryTypes[allocation->m_MemoryTypeIndex].heapIndex;
+    m_HeapInfos[heapIndex].usedSize -= allocation->m_Size;
+
+    auto it = std::find(m_HeapInfos[heapIndex].allocations.begin(),m_HeapInfos[heapIndex].allocations.end(),allocation);
+    if(it!=m_HeapInfos[heapIndex].allocations.end())
+    {
+        m_HeapInfos[heapIndex].allocations.erase(it);
+    }
+    allocation->m_FreedBySystem = true;
+    delete allocation;
+    allocation= nullptr;
+}
+
+#if MONKEY_DEBUG
+void VulkanDeviceMemoryManager::DumpMemory()
+{
+    SetupAndPrintMemInfo();
+    MLOG("Device Memory: %d allocations on %lu heaps", m_NumAllocations, (uint32)m_HeapInfos.size());
+    for (int32 index = 0; index < m_HeapInfos.size(); ++index)
+    {
+        HeapInfo& heapInfo = m_HeapInfos[index];
+        MLOG("\tHeap %d, %lu allocations", index, (uint32)heapInfo.allocations.size());
+        uint64 totalSize = 0;
+        for (int32 subIndex = 0; subIndex < heapInfo.allocations.size(); ++subIndex)
+        {
+            VulkanDeviceMemoryAllocation* allocation = heapInfo.allocations[subIndex];
+            MLOG("\t\t%d Size %llu Handle %p", subIndex, (uint64)allocation->m_Size, (void*)allocation->m_Handle);
+            totalSize += allocation->m_Size;
+        }
+        MLOG("\t\tTotal Allocated %.2f MB, Peak %.2f MB", totalSize / 1024.0f / 1024.0f, heapInfo.peakSize / 1024.0f / 1024.0f);
+    }
+}
+#endif
+
+uint64 VulkanDeviceMemoryManager::GetTotalMemory(bool gpu) const
+{
+    uint64 totalMemory = 0;
+    for(uint32 index=0;index<m_MemoryProperties.memoryHeapCount;++index)
+    {
+        const bool isGPUHeap = (m_MemoryProperties.memoryHeaps[index].flags&VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)==VK_MEMORY_HEAP_DEVICE_LOCAL_BIT;
+        if(isGPUHeap==gpu)
+        {
+            totalMemory+=m_HeapInfos[index].totalSize;
+        }
+    }
+    return totalMemory;
+}
+
 
 void VulkanDeviceMemoryManager::SetupAndPrintMemInfo()
 {
@@ -215,6 +329,12 @@ void VulkanDeviceMemoryManager::SetupAndPrintMemInfo()
         }
     }
 }
+
+
+
+
+
+
 
 VulkanBufferSubAllocation* VulkanResourceHeapManager::AllocateBuffer(uint32 size, VkBufferUsageFlags bufferUsageFlags, VkMemoryPropertyFlags memoryPropertyFlags, const char* file, uint32 line)
 {
@@ -460,6 +580,41 @@ void VulkanDeviceMemoryAllocation::Unmap()
 }
 
 
+void VulkanDeviceMemoryAllocation::FlushMappedMemory(VkDeviceSize offset, VkDeviceSize size)
+{
+    if(!IsCoherent())
+    {
+        VkMappedMemoryRange range;
+        ZeroVulkanStruct(range, VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE);
+        range.memory = m_Handle;
+        range.offset = offset;
+        range.size = size;
+        vkFlushMappedMemoryRanges(m_Device, 1, &range);
+    }
+}
+
+
+void VulkanDeviceMemoryAllocation::InvalidateMappedMemory(VkDeviceSize offset, VkDeviceSize size)
+{
+    if(!IsCoherent())
+    {
+        VkMappedMemoryRange range;
+        ZeroVulkanStruct(range, VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE);
+        range.memory = m_Handle;
+        range.offset = offset;
+        range.size = size;
+        vkInvalidateMappedMemoryRanges(m_Device, 1, &range);
+    }
+}
+
+
+
+
+
+
+
+
+
 VulkanResourceHeapPage::VulkanResourceHeapPage(VulkanResourceHeap* owner, VulkanDeviceMemoryAllocation* deviceMemoryAllocation, uint32 id):
 m_Owner(owner),m_DeviceMemoryAllocation(deviceMemoryAllocation),m_MaxSize(0),m_UsedSize(0),m_PeakNumAllocations(0),m_FrameFreed(0),m_ID(id)
 {
@@ -505,6 +660,334 @@ void VulkanResourceHeapPage::ReleaseAllocation(VulkanResourceAllocation* allocat
 
 VulkanResourceAllocation* VulkanResourceHeapPage::TryAllocate(uint32 size, uint32 alignment, const char* file, uint32 line)
 {
-    
+    for(int32 index=0;index<m_FreeList.size();++index)
+    {
+        VulkanRange& entry = m_FreeList[index];
+        uint32 allocateOffset = entry.offset;
+        uint32 alignedOffset = Align(entry.offset, alignment);
+        uint32 aligmentAdjustment = alignedOffset- entry.offset;
+        //padding + require size
+        uint32 allocatedSize = aligmentAdjustment+size;
+
+        if(allocatedSize<=entry.size)
+        {
+            if(allocatedSize<entry.size)
+            {
+                entry.size -= allocatedSize;
+                entry.offset+=allocatedSize;
+            } 
+            else 
+            {
+                m_FreeList.erase(m_FreeList.begin()+index);
+            }
+            m_UsedSize +=allocatedSize;
+            VulkanResourceAllocation* newResourceAllication = new VulkanResourceAllocation(this,m_DeviceMemoryAllocation,size,alignedOffset,allocatedSize,allocateOffset,file,line);
+            m_ResourceAllocations.push_back(newResourceAllication);
+            m_PeakNumAllocations = MMath::Max((uint32)m_PeakNumAllocations,(uint32)m_ResourceAllocations.size());
+            return newResourceAllication;
+        }
+    }
+    return nullptr;
 }
 
+bool VulkanResourceHeapPage::JoinFreeBlocks()
+{
+    VulkanRange::JoinConsecutiveRanges(m_FreeList);
+    //mark, why m_FreeList size must be 1
+    if(m_FreeList.size()==1)
+    {
+        if(m_ResourceAllocations.size()==0)
+        {
+            if(m_UsedSize>0)
+            {
+                MLOG("Memory leak, used size=%d",(int32)m_UsedSize);
+            }
+            if(m_FreeList[0].offset!=0||m_FreeList[0].size!=m_MaxSize)
+            {
+                MLOGE("Memory leak, should have %d free, only have %d; missing %d bytes", m_MaxSize, m_FreeList[0].size, m_MaxSize - m_FreeList[0].size);
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
+VulkanResourceHeap::VulkanResourceHeap(VulkanResourceHeapManager* owner, uint32 memoryTypeIndex,uint32 pageSize)
+:m_Owner(owner),
+m_MemoryTypeIndex(memoryTypeIndex),
+m_IsHostCachedSupported(false),
+m_IsLazilyAllocatedSupported(false),
+m_DefualtPageSize(pageSize),
+m_PeakPageSize(0),
+m_UsedMemory(0),
+m_PageIDCounter(0)
+{
+
+}
+
+
+VulkanResourceHeap::~VulkanResourceHeap()
+{
+    ReleaseFreedPages(true);
+    auto DelePages = [&](std::vector<VulkanResourceHeapPage*>& usedPages,const char* name)
+    {
+        bool leak = false;
+        for(int32 index=(int32)usedPages.size()-1;index>=0;--index)
+        {
+            VulkanResourceHeapPage* page = usedPages[index];
+            if(!page->JoinFreeBlocks())
+            {
+                MLOG("Page allocation %p has unfreed %s resources", (void*)page->m_DeviceMemoryAllocation->GetHandle(), name);
+                leak = true;
+            }
+            m_Owner->GetVulkanDevice()->GetMemoryManager().Free(page->m_DeviceMemoryAllocation);
+            delete page;
+        }
+        usedPages.clear();
+        return leak;
+    };
+    bool dump = false;
+    dump = dump || DelePages(m_UsedBufferPages, "Buffer");
+    dump = dump || DelePages(m_UsedImagePages, "Image");
+    dump = dump || DelePages(m_FreePages, "Free");
+    if(dump)
+    {
+#if MONKEY_DEBUG
+        m_Owner->GetVulkanDevice()->GetMemoryManager().DumpMemory();
+#endif     
+    }
+}
+
+void VulkanResourceHeap::FreePage(VulkanResourceHeapPage *page)
+{
+    page->JoinFreeBlocks();
+    bool removed = false;
+    for(int32 i=0;i<m_UsedBufferPages.size();i++)
+    {
+        if(m_UsedBufferPages[i]==page)
+        {
+            removed = true;
+            m_UsedBufferPages.erase(m_UsedImagePages.begin()+i);
+            break;
+        }
+    }
+
+    for(int32 i=0;i<m_UsedImagePages.size();++i)
+    {
+        if(m_UsedImagePages[i]==page)
+        {
+            removed=true;
+            m_UsedImagePages.erase(m_UsedBufferPages.begin()+i);
+            break;
+        }
+    }
+    if(removed)
+    {
+        page->m_FrameFreed=0;
+        m_FreePages.push_back(page);
+    }
+}
+
+
+
+void VulkanResourceHeap::ReleaseFreedPages(bool immediately)
+{
+    for(int32 index=0;index<m_FreePages.size();++index)
+    {
+        VulkanResourceHeapPage* page = m_FreePages[index];
+        m_UsedMemory -=page->m_MaxSize;
+        m_Owner->GetVulkanDevice()->GetMemoryManager().Free(page->m_DeviceMemoryAllocation);
+        delete page;
+    }
+    m_FreePages.clear();
+}
+#if MONKEY_DEBUG
+void VulkanResourceHeap::DumpMemory()
+{
+      MLOG("%d Free Pages", (int32)m_FreePages.size());
+    
+    auto DumpPages = [&](std::vector<VulkanResourceHeapPage*>& usedPages, const char* typeName)
+    {
+        MLOG("\t%s Pages: %d Used, Peak Allocation Size on a Page %d", typeName, (int32)usedPages.size(), m_PeakPageSize);
+        uint64 subAllocUsedMemory      = 0;
+        uint64 subAllocAllocatedMemory = 0;
+        uint32 numSubAllocations       = 0;
+        for (int32 index = 0; index < usedPages.size(); ++index)
+        {
+            subAllocUsedMemory      += usedPages[index]->m_UsedSize;
+            subAllocAllocatedMemory += usedPages[index]->m_MaxSize;
+            numSubAllocations       += (uint32)usedPages[index]->m_ResourceAllocations.size();
+            MLOG("\t\t%d: ID %4d %4d suballocs, %4d free chunks (%d used/%d free/%d max) DeviceMemory %p", index, usedPages[index]->GetID(), (int32)usedPages[index]->m_ResourceAllocations.size(), (int32)usedPages[index]->m_FreeList.size(), usedPages[index]->m_UsedSize, usedPages[index]->m_MaxSize - usedPages[index]->m_UsedSize, usedPages[index]->m_MaxSize, (void*)usedPages[index]->m_DeviceMemoryAllocation->GetHandle());
+        }
+        
+        MLOG("%d Suballocations for Used/Total: %d/%d = %.2f%%", numSubAllocations, (int32)subAllocUsedMemory, (int32)subAllocAllocatedMemory, subAllocAllocatedMemory > 0 ? 100.0f * (float)subAllocUsedMemory / (float)subAllocAllocatedMemory : 0.0f);
+    };
+    
+    DumpPages(m_UsedBufferPages, "Buffer");
+    DumpPages(m_UsedImagePages,  "Image");
+
+}
+#endif
+
+VulkanResourceAllocation* VulkanResourceHeap::AllocateResource(Type type, uint32 size, uint32 alignment, bool mapAllocation, const char* file, uint32 line)
+{
+    std::vector<VulkanResourceHeapPage*>& usedPages = type==Type::Image?m_UsedImagePages:m_UsedBufferPages;
+    uint32 targetDefualtPageSize = m_DefualtPageSize;
+    if(size<targetDefualtPageSize)
+    {
+        //mark, we try to allocate from Used pages?
+        for(int32 index=0;index<usedPages.size();++index)
+        {
+            VulkanResourceHeapPage* it = usedPages[index];
+            if(it->m_DeviceMemoryAllocation->IsMapped()==mapAllocation)
+            {
+                VulkanResourceAllocation* resourceAllocation = it->TryAllocate( size, alignment, file,  line);
+                if(resourceAllocation)
+                {
+                    return resourceAllocation;
+                }
+            }
+        }
+    }
+
+    for(int32 index=0;index<m_FreePages.size();++index)
+    {
+        VulkanResourceHeapPage* page = m_FreePages[index];
+        if(page->m_DeviceMemoryAllocation->IsMapped()==mapAllocation)
+        {
+            VulkanResourceAllocation* resourceAllocation = page->TryAllocate( size, alignment, file,  line);
+            if(resourceAllocation)
+            {
+                m_FreePages.erase(m_FreePages.begin()+index);
+                usedPages.push_back(page);
+                return resourceAllocation;
+            }
+        }
+    }
+
+    uint32 allocationSize = MMath::Max(size,targetDefualtPageSize);
+    VulkanDeviceMemoryAllocation* deviceMemoryAllocation = m_Owner->GetVulkanDevice()->GetMemoryManager().Alloc(true,allocationSize,m_MemoryTypeIndex,nullptr,file,line);
+    if(!deviceMemoryAllocation&&size<allocationSize)
+    {
+        deviceMemoryAllocation = m_Owner->GetVulkanDevice()->GetMemoryManager().Alloc(false,size,m_MemoryTypeIndex,nullptr,file,line);
+    }
+
+    VulkanResourceHeapPage* newPage = new VulkanResourceHeapPage(this,deviceMemoryAllocation,m_PageIDCounter);
+    usedPages.push_back(newPage);
+
+    m_PageIDCounter+=1;
+    m_UsedMemory+=allocationSize;
+    m_PeakPageSize = MMath::Max(m_PeakPageSize,allocationSize);
+    if(mapAllocation)
+    {
+        deviceMemoryAllocation->Map(allocationSize,0);
+    }   
+    return newPage->Allocate(size,  alignment,file,  line);
+}
+
+VulkanResourceHeapManager::VulkanResourceHeapManager(VulkanDevice* device)
+:m_VulkanDevice(device),m_DeviceMemoryManager(&device->GetMemoryManager())
+{
+
+}
+
+VulkanResourceHeapManager::~VulkanResourceHeapManager()
+{
+    Destory();
+}
+
+void VulkanResourceHeapManager::Init()
+{
+    VulkanDeviceMemoryManager& memoryManager  = m_VulkanDevice->GetMemoryManager();
+
+    const uint32 typeBits = (1<<memoryManager.GetNumMemoryTypes())-1;
+    const VkPhysicalDeviceMemoryProperties& memoryProperties = memoryManager.GetMemoryProperties();
+
+    m_ResourceTypeHeaps.resize(memoryProperties.memoryTypeCount);
+
+    auto GetMemoryTypesFromProperties = [memoryProperties](uint32 typeBits,VkMemoryPropertyFlags properties,std::vector<uint32>& outTypeIndices)
+    {
+        for(uint32 i=0;i<memoryProperties.memoryTypeCount&&typeBits;++i)
+        {
+            if((typeBits&1)==1)
+            {
+                if((memoryProperties.memoryTypes[i].propertyFlags&properties)==properties)
+                {
+                    outTypeIndices.push_back(i);
+                }
+            }
+            typeBits>>=1;
+        }
+        for(int32 index=(int32)outTypeIndices.size()-1;index>=1;--index)
+        {
+            if(memoryProperties.memoryTypes[index].propertyFlags!=memoryProperties.memoryTypes[0].propertyFlags)
+            {
+                outTypeIndices.erase(outTypeIndices.begin()+index);
+            }
+        }
+        return outTypeIndices.size()>0;
+    };
+    {
+      std::vector<uint32> typeIndices;
+      GetMemoryTypesFromProperties(typeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, typeIndices);
+      for(int32 index=0;index<typeIndices.size();index++)
+      {
+        int32 heapIndex = memoryProperties.memoryTypes[typeIndices[index]].heapIndex;
+        VkDeviceSize heapSize = memoryProperties.memoryHeaps[heapIndex].size;
+        VkDeviceSize pageSize = MMath::Min<VkDeviceSize>(heapSize/8,GPU_ONLY_HEAP_PAGE_SIZE);
+        m_ResourceTypeHeaps[typeIndices[index]] = new VulkanResourceHeap(this, typeIndices[index], uint32(pageSize));
+        m_ResourceTypeHeaps[typeIndices[index]]->m_IsHostCachedSupported      = ((memoryProperties.memoryTypes[index].propertyFlags & VK_MEMORY_PROPERTY_HOST_CACHED_BIT)      == VK_MEMORY_PROPERTY_HOST_CACHED_BIT);
+        m_ResourceTypeHeaps[typeIndices[index]]->m_IsLazilyAllocatedSupported = ((memoryProperties.memoryTypes[index].propertyFlags & VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT) == VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT);
+      }  
+    }
+
+    {
+        uint32 typeIndex = 0;
+        VERIFYVULKANRESULT(memoryManager.GetMemoryTypeFromProperties(typeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &typeIndex));
+        m_ResourceTypeHeaps[typeIndex] = new VulkanResourceHeap(this, typeIndex, STAGING_HEAP_PAGE_SIZE);
+    }
+    
+    {
+        uint32 typeIndex          = 0;
+        uint32 hostVisCachedIndex = 0;
+        VkResult hostCachedResult = memoryManager.GetMemoryTypeFromProperties(typeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT, &hostVisCachedIndex);
+        uint32 hostVisIndex       = 0;
+        VkResult hostResult       = memoryManager.GetMemoryTypeFromProperties(typeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &hostVisIndex);
+        if (hostCachedResult == VK_SUCCESS) {
+            typeIndex = hostVisCachedIndex;
+        }
+        else if (hostResult == VK_SUCCESS) {
+            typeIndex = hostVisIndex;
+        }
+        else {
+            MLOG("No Memory Type found supporting VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT!");
+        }
+        m_ResourceTypeHeaps[typeIndex] = new VulkanResourceHeap(this, typeIndex, STAGING_HEAP_PAGE_SIZE);
+    }
+}
+
+
+void VulkanResourceHeapManager::Destory()
+{
+    DestroyResourceAllocations();
+    for (int32 index = 0; index < m_ResourceTypeHeaps.size(); ++index)
+    {
+        delete m_ResourceTypeHeaps[index];
+        m_ResourceTypeHeaps[index] = nullptr;
+    }
+    m_ResourceTypeHeaps.clear();
+}
+
+
+VulkanResourceAllocation* VulkanResourceHeapManager::AllocateBufferMemory(const VkMemoryRequirements& memoryReqs, VkMemoryPropertyFlags memoryPropertyFlags, const char* file, uint32 line)
+{
+    uint32 typeIndex = 0;
+    VERIFYVULKANRESULT(m_DeviceMemoryManager->GetMemoryTypeFromProperties(memoryReqs.memoryTypeBits, memoryPropertyFlags, &typeIndex));
+
+    bool canMapped = (memoryPropertyFlags&VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)==VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+    
+    
+
+}

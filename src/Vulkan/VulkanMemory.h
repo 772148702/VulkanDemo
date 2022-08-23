@@ -291,7 +291,7 @@ class VulkanResourceAllocation: public RefCount
     }
 private:
     friend class VulkanResourceHeapPage;
-    
+    bool JoinFreeBlocks();
 private:
     VulkanResourceHeapPage*         m_Owner;
     uint32                          m_AllocationSize;
