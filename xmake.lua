@@ -10,7 +10,10 @@ include_dir_list = {
 links_list={"User32","Gdi32"}
 add_defines("PLATFORM_WINDOWS","NOMINMAX","MONKEY_DEBUG")
 target("Vulkan")
-    add_files("./src/**.cpp")
-    add_includedirs(include_dir_list, "$(projectdir)/src")
+    set_kind("static")
+    add_files("./src/Engine/**.cpp")
+    add_includedirs(include_dir_list, "$(projectdir)/src/Engine")
     add_links(links_list,"$(projectdir)/external/vulkan/windows/lib/vulkan-1")
 target_end()
+
+includes("src/Example/**/xmake.lua")

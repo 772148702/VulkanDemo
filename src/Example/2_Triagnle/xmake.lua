@@ -1,0 +1,5 @@
+target("EX2_Triangle")
+set_kind("binary")
+add_files("/*.cpp")
+add_includedirs(include_dir_list, "$(projectdir)/src/Engine")
+add_deps("Vulkan")

@@ -416,6 +416,163 @@ VulkanBufferSubAllocation* VulkanResourceHeapManager::AllocateBuffer(uint32 size
 }
 
 
+void  VulkanResourceHeapManager::ReleaseBuffer(VulkanSubBufferAllocator *bufferAllocator)
+{
+    bufferAllocator->JoinFreeBlocks();
+    //release memory in pool ?
+    for(int32 index=0;index<m_UsedBufferAllocations[bufferAllocator->m_PoolSizeIndex].size();++index)
+    {
+        if(m_UsedBufferAllocations[bufferAllocator->m_PoolSizeIndex][index]==bufferAllocator)
+        {
+            m_UsedBufferAllocations[bufferAllocator->m_PoolSizeIndex].erase(m_UsedBufferAllocations[bufferAllocator->m_PoolSizeIndex].begin()+index);
+        }
+    }
+    bufferAllocator->m_FrameFreed = 0;
+    m_FreeBufferAllocations[bufferAllocator->m_PoolSizeIndex].push_back(bufferAllocator);
+}
+
+
+#if MONKEY_DEBUG
+void VulkanResourceHeapManager::DumpMemory()
+{
+    for (int32 index = 0; index < m_ResourceTypeHeaps.size(); ++index)
+    {
+        if (m_ResourceTypeHeaps[index]) {
+            MLOG("Heap %d, Memory Type Index %d", index, m_ResourceTypeHeaps[index]->m_MemoryTypeIndex);
+            m_ResourceTypeHeaps[index]->DumpMemory();
+        }
+        else {
+            MLOG("Heap %d, NOT USED", index);
+        }
+    }
+    
+    uint64 usedBinnedTotal  = 0;
+    uint64 allocBinnedTotal = 0;
+    uint64 usedLargeTotal   = 0;
+    uint64 allocLargeTotal  = 0;
+    
+    for (int32 poolSizeIndex = 0; poolSizeIndex < (int32)PoolSizes::SizesCount + 1; poolSizeIndex++)
+    {
+        std::vector<VulkanSubBufferAllocator*>& usedAllocations = m_UsedBufferAllocations[poolSizeIndex];
+        std::vector<VulkanSubBufferAllocator*>& freeAllocations = m_FreeBufferAllocations[poolSizeIndex];
+        if (poolSizeIndex == (int32)PoolSizes::SizesCount) {
+            MLOG("Buffer of large size Allocations: %d Used / %d Free", (int32)usedAllocations.size(), (int32)freeAllocations.size());
+        }
+        else {
+            MLOG("Buffer of %d size Allocations: %d Used / %d Free", m_PoolSizes[poolSizeIndex], (int32)usedAllocations.size(), (int32)freeAllocations.size());
+        }
+        
+        if (usedAllocations.size() > 0)
+        {
+            uint64 _UsedBinnedTotal  = 0;
+            uint64 _AllocBinnedTotal = 0;
+            uint64 _UsedLargeTotal   = 0;
+            uint64 _AllocLargeTotal  = 0;
+            
+            MLOG("Index  BufferHandle   DeviceMemoryHandle MemFlags BufferFlags #Suballocs #FreeChunks UsedSize/MaxSize");
+            for (int32 index = 0; index < usedAllocations.size(); ++index)
+            {
+                VulkanSubBufferAllocator* bufferAllocation = usedAllocations[index];
+                MLOG("%6d %p %p 0x%06x 0x%08x %6d   %6d    %d/%d", index, (void*)bufferAllocation->m_Buffer, (void*)bufferAllocation->m_DeviceMemoryAllocation->GetHandle(), bufferAllocation->m_MemoryPropertyFlags, bufferAllocation->m_BufferUsageFlags, (int32)bufferAllocation->m_SubAllocations.size(), (int32)bufferAllocation->m_FreeList.size(), (int32)bufferAllocation->m_UsedSize, bufferAllocation->m_MaxSize);
+                
+                if (poolSizeIndex == (int32)PoolSizes::SizesCount)
+                {
+                    _UsedLargeTotal  += bufferAllocation->m_UsedSize;
+                    _AllocLargeTotal += bufferAllocation->m_MaxSize;
+                    usedLargeTotal   += bufferAllocation->m_UsedSize;
+                    allocLargeTotal  += bufferAllocation->m_MaxSize;
+                }
+                else
+                {
+                    _UsedBinnedTotal  += bufferAllocation->m_UsedSize;
+                    _AllocBinnedTotal += bufferAllocation->m_MaxSize;
+                    usedBinnedTotal   += bufferAllocation->m_UsedSize;
+                    allocBinnedTotal  += bufferAllocation->m_MaxSize;
+                }
+            }
+            
+            if (poolSizeIndex == (int32)PoolSizes::SizesCount)  {
+                MLOG(" Large Alloc Used/Max %d/%d %.2f%%", (int32)_UsedLargeTotal, (int32)_AllocLargeTotal, 100.0f * (float)_UsedLargeTotal / (float)_AllocLargeTotal);
+            }
+            else {
+                MLOG(" Binned [%d] Alloc Used/Max %d/%d %.2f%%", m_PoolSizes[poolSizeIndex], (int32)_UsedBinnedTotal, (int32)_AllocBinnedTotal, 100.0f * (float)_UsedBinnedTotal / (float)_AllocBinnedTotal);
+            }
+        }
+    }
+    
+    MLOG("::Totals::");
+    MLOG("Large Alloc Used/Max %d/%d %.2f%%", (int32)usedLargeTotal, (int32)allocLargeTotal, 100.0f * allocLargeTotal > 0 ? (float)usedLargeTotal / (float)allocLargeTotal : 0.0f);
+    MLOG("Binned Alloc Used/Max %d/%d %.2f%%", (int32)usedBinnedTotal, (int32)allocBinnedTotal, allocBinnedTotal > 0 ? 100.0f * (float)usedBinnedTotal / (float)allocBinnedTotal : 0.0f);
+}
+#endif
+
+
+void VulkanResourceHeapManager::DestroyResourceAllocations()
+{
+    ReleaseFreedResources(true);
+    for(auto& usedAllocations:m_UsedBufferAllocations)
+    {
+        for(int32 index = (int32)usedAllocations.size()-1;index>=0;--index)
+        {
+            VulkanSubBufferAllocator* bufferAllocation = usedAllocations[index];
+            if (!bufferAllocation->JoinFreeBlocks()) {
+                MLOG("Suballocation(s) for Buffer %p were not released.", (void*)bufferAllocation->m_Buffer);
+            }
+            bufferAllocation->Destroy(m_VulkanDevice);
+            m_VulkanDevice->GetMemoryManager().Free(bufferAllocation->m_DeviceMemoryAllocation);
+            delete bufferAllocation;
+        }
+        usedAllocations.clear();
+    }
+
+    for (auto& freeAllocations : m_FreeBufferAllocations)
+    {
+        for (int32 index = 0; index < freeAllocations.size(); ++index)
+        {
+            VulkanSubBufferAllocator* bufferAllocation = freeAllocations[index];
+            bufferAllocation->Destroy(m_VulkanDevice);
+            m_VulkanDevice->GetMemoryManager().Free(bufferAllocation->m_DeviceMemoryAllocation);
+            delete bufferAllocation;
+        }
+        freeAllocations.clear();
+    }
+
+}
+
+
+void VulkanResourceHeapManager::ReleaseFreedResources(bool immediately)
+{
+    ReleaseFreedResources(true);
+    for(auto& usedAllocations:m_UsedBufferAllocations)
+    {
+        for(int32 index=(int32)usedAllocations.size()-1;index>=0;--index)
+        {
+            VulkanSubBufferAllocator* bufferAllocation = usedAllocations[index];
+            if(!bufferAllocation->JoinFreeBlocks())
+            {
+                MLOG("Suballocation(s) for Buffer %p were not released.", (void*)bufferAllocation->m_Buffer);
+            }
+            bufferAllocation->Destroy(m_VulkanDevice);
+            m_VulkanDevice->GetMemoryManager().Free(bufferAllocation->m_DeviceMemoryAllocation);
+            delete bufferAllocation;
+        }
+        usedAllocations.clear();
+    }
+
+    for(auto& freeAllocation:m_FreeBufferAllocations)
+    {
+        for(int32 index=0;index<freeAllocation.size();++index)
+        {
+            VulkanSubBufferAllocator* bufferAllocation = freeAllocation[index];
+            bufferAllocation->Destroy(m_VulkanDevice);
+            m_VulkanDevice->GetMemoryManager().Free(bufferAllocation->m_DeviceMemoryAllocation);
+            delete bufferAllocation;
+        }
+        freeAllocation.clear();
+    }
+}
+
+
 VulkanSubResourceAllocator::VulkanSubResourceAllocator(VulkanResourceHeapManager* owner, VulkanDeviceMemoryAllocation* deviceMemoryAllocation, uint32 memoryTypeIndex, VkMemoryPropertyFlags memoryPropertyFlags, uint32 alignment)
     : m_Owner(owner)
     , m_MemoryTypeIndex(memoryTypeIndex)
@@ -803,6 +960,8 @@ void VulkanResourceHeap::ReleaseFreedPages(bool immediately)
     }
     m_FreePages.clear();
 }
+
+
 #if MONKEY_DEBUG
 void VulkanResourceHeap::DumpMemory()
 {
@@ -1048,3 +1207,4 @@ VulkanResourceAllocation* VulkanResourceHeapManager::AllocateImageMemory(const V
     return allocation;
 
 }
+

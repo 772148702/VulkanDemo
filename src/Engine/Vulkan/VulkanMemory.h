@@ -502,6 +502,7 @@ protected:
     VulkanDevice*							m_VulkanDevice;
     VulkanDeviceMemoryManager*              m_DeviceMemoryManager;
     std::vector<VulkanResourceHeap*>        m_ResourceTypeHeaps;
+    //mark, what is subbufferallocator
     std::vector<VulkanSubBufferAllocator*>  m_UsedBufferAllocations[(int32)PoolSizes::SizesCount + 1];
     std::vector<VulkanSubBufferAllocator*>  m_FreeBufferAllocations[(int32)PoolSizes::SizesCount + 1];
 };

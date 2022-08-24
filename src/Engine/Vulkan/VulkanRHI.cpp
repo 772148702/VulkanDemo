@@ -270,3 +270,4 @@ void VulkanRHI::SelectAndInitDevice()
     m_Device->InitGPU(deviceIndex);
 
 }
+
