@@ -2,6 +2,7 @@
 #include "Common/Log.h"
 
 #include "Application/AppModuleBase.h"
+#include "Core/PixelFormat.h"
 #include "Math/Vector3.h"
 #include "Math/Vector4.h"
 #include "Math/Matrix4x4.h"
@@ -10,6 +11,7 @@
 
 #include "Vulkan/VulkanCommon.h"
 #include "Vulkan/VulkanGlobals.h"
+#include "Vulkan/VulkanRHI.h"
 #include "vulkan/vulkan_core.h"
 
 #include <cstring>
@@ -70,6 +72,220 @@ private:
         Matrix4x4 view;
         Matrix4x4 projection;
     };
+
+
+   void CreateFrameBuffer()
+   {
+        DestroyFrameBuffers();
+        int32 width = GetVulkanRHI()->GetSwapChain()->GetWidth();
+        int32 height = GetVulkanRHI()->GetSwapChain()->GetHeight();
+        VkDevice device = GetVulkanRHI()->GetDevice()->GetInstanceHandle();
+        
+        VkImageView attachments[3];
+        attachments[1] = m_DepthStencilView;
+
+        VkFramebufferCreateInfo createInfo;
+        ZeroVulkanStruct(createInfo,VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO);
+        createInfo.renderPass = m_RenderPass;
+        createInfo.attachmentCount = 2;
+        createInfo.pAttachments = attachments;
+        createInfo.width = width;
+        createInfo.height = height;
+        createInfo.layers = 1;
+
+        const std::vector<VkImageView>& backBuffer = GetVulkanRHI()->GetBackbufferViews();
+
+        m_FrameBuffers.resize(backBuffer.size());
+
+        for (uint32 i=0;i<m_FrameBuffers.size(); ++i) 
+        {
+            attachments[0] =backBuffer[i];
+            VERIFYVULKANRESULT(vkCreateFramebuffer(device, &createInfo, VULKAN_CPU_ALLOCATOR,&m_FrameBuffers[i]));
+        }
+   }
+
+   void CreateDepthStencil() override
+   {
+        DestoryDepthStencil();
+
+        int32 fwidth = GetVulkanRHI()->GetSwapChain()->GetWidth();
+        int32 fheight = GetVulkanRHI()->GetSwapChain()->GetHeight();
+        VkDevice device = GetVulkanRHI()->GetDevice()->GetInstanceHandle();
+
+        VkImageCreateInfo imageCreateInfo;
+        ZeroVulkanStruct(imageCreateInfo, VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO);
+        imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
+        imageCreateInfo.format = PixelFormatToVkFormat(m_DepthFormat, false);
+        imageCreateInfo.extent = {(uint32)fwidth,(uint32)fheight};
+        imageCreateInfo.mipLevels = 1;
+        imageCreateInfo.arrayLayers = 1;
+        imageCreateInfo.samples = m_SampleCount;
+        imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+        imageCreateInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+        imageCreateInfo.flags = 0;
+        VERIFYVULKANRESULT(vkCreateImage(device, &imageCreateInfo, VULKAN_CPU_ALLOCATOR, &m_DepthStencilImage));
+
+        VkImageViewCreateInfo imageViewCreateInfo;
+        ZeroVulkanStruct(imageViewCreateInfo,VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO);
+        imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        imageViewCreateInfo.image = m_DepthStencilImage;
+        imageViewCreateInfo.flags = 0;
+        imageViewCreateInfo.format = PixelFormatToVkFormat(m_DepthFormat,false);
+        imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT |VK_IMAGE_ASPECT_STENCIL_BIT;
+        imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
+        imageViewCreateInfo.subresourceRange.levelCount = 1;
+        imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+        imageViewCreateInfo.subresourceRange.layerCount =1;
+
+        VkMemoryRequirements memRequire;
+        vkGetImageMemoryRequirements(device,imageViewCreateInfo.image,&memRequire);
+        //mark, what is the usage of typeindex
+        uint32 memoryTypeIndex = 0;
+        VERIFYVULKANRESULT(GetVulkanRHI()->GetDevice()->GetMemoryManager().GetMemoryTypeFromProperties(memRequire.memoryTypeBits,VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,&memoryTypeIndex));
+
+        //bind buffer and memory
+        VkMemoryAllocateInfo memAllocateInfo;
+        ZeroVulkanStruct(memAllocateInfo, VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO);
+        memAllocateInfo.memoryTypeIndex = memoryTypeIndex;
+        memAllocateInfo.allocationSize = memRequire.size;
+        vkAllocateMemory(device,&memAllocateInfo,VULKAN_CPU_ALLOCATOR,&m_DepthStencilMemory);
+        vkBindImageMemory(device,m_DepthStencilImage,m_DepthStencilMemory,0);
+
+        vkCreateImageView(device,&imageViewCreateInfo,VULKAN_CPU_ALLOCATOR,&m_DepthStencilView);
+   }
+
+   void SetupCommandBuffers()
+   {
+      VkCommandBufferBeginInfo cmdBeginInfo;
+      ZeroVulkanStruct(cmdBeginInfo, VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO);
+
+      VkClearValue clearValues[2];
+      clearValues[0].color = {{0.2f,0.2f,0.2f,1.0f}};
+
+      clearValues[1].depthStencil = {1.0f,0};
+    
+      int32 fwidth  = GetVulkanRHI()->GetSwapChain()->GetWidth();
+      int32 fheight = GetVulkanRHI()->GetSwapChain()->GetHeight();
+
+      VkRenderPassBeginInfo renderBeginInfo;
+      ZeroVulkanStruct(renderBeginInfo,VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO);
+      renderBeginInfo.renderPass = m_RenderPass;
+      renderBeginInfo.clearValueCount = 2;
+      renderBeginInfo.pClearValues = clearValues;
+      renderBeginInfo.renderArea.offset.x=0;
+      renderBeginInfo.renderArea.offset.y = 0;
+      renderBeginInfo.renderArea.extent.width = fwidth;
+      renderBeginInfo.renderArea.extent.height = fheight;
+
+      for (int32 i=0; i<m_CommandBuffers.size(); ++i) 
+      {
+         renderBeginInfo.framebuffer = m_FrameBuffers[i];  
+
+         VkViewport viewport ={};
+         viewport.x =0;
+         viewport.y =(float)fheight;
+         viewport.width =(float)fwidth;
+         viewport.height = -(float) fheight;//flip
+         viewport.minDepth = 0.0f;
+         viewport.maxDepth = 1.0f;
+
+         VkRect2D scissor = {};
+         scissor.extent.width = fwidth;
+         scissor.extent.height = fheight;
+         scissor.offset.x = 0;
+         scissor.offset.y =0;
+
+         VkDeviceSize offsets[1] = {0};
+         VERIFYVULKANRESULT(vkBeginCommandBuffer(m_CommandBuffers[i], &cmdBeginInfo));
+            vkCmdBeginRenderPass(m_CommandBuffers[i], &renderBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+            vkCmdSetViewport(m_CommandBuffers[i], 0, 1, &viewport);
+            vkCmdSetScissor(m_CommandBuffers[i], 0, 1, &scissor);
+            vkCmdBindDescriptorSets(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &m_DescriptorSet, 0, nullptr);
+            vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline);
+            vkCmdBindVertexBuffers(m_CommandBuffers[i], 0, 1, &m_VertexBuffer.buffer, offsets);
+            vkCmdBindIndexBuffer(m_CommandBuffers[i], m_IndicesBuffer.buffer, 0, VK_INDEX_TYPE_UINT16);
+            vkCmdDrawIndexed(m_CommandBuffers[i], m_IndicesCount, 1, 0, 0, 0);
+            vkCmdEndRenderPass(m_CommandBuffers[i]);
+        VERIFYVULKANRESULT(vkEndCommandBuffer(m_CommandBuffers[i]));
+      }
+   }
+
+
+   void CreateRenderPass() override
+   {
+        DestoryRenderPass();
+        VkDevice device = GetVulkanRHI()->GetDevice()->GetInstanceHandle();
+        PixelFormat pixelFormat = GetVulkanRHI()->GetPixelFormat();
+        std::vector<VkAttachmentDescription> attachments(2);
+
+        attachments[0].format   = PixelFormatToVkFormat(pixelFormat, false);
+        attachments[0].samples  = m_SampleCount;
+        attachments[0].loadOp   = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        attachments[0].storeOp  = VK_ATTACHMENT_STORE_OP_STORE;
+        attachments[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        attachments[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        //what is meaning of the following two mask
+        attachments[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        attachments[0].finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+        //depth stencil attachment
+        attachments[1].format = PixelFormatToVkFormat(m_DepthFormat,false);
+        attachments[1].samples        = m_SampleCount;
+        attachments[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        attachments[1].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        attachments[1].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        //why dont care(may be we dont use stencil?)
+        attachments[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        attachments[1].initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+        attachments[1].finalLayout    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        //mark, ???
+        VkAttachmentReference colorReference = { };
+        colorReference.attachment = 0;
+        colorReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+        VkAttachmentReference depthReference ={};
+        depthReference.attachment = 1;
+        depthReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+        VkSubpassDescription subpassDescription = { };
+        subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+        subpassDescription.colorAttachmentCount = 1;
+        subpassDescription.pColorAttachments = &colorReference;
+        subpassDescription.pDepthStencilAttachment = &depthReference;
+        subpassDescription.pResolveAttachments= nullptr;
+        subpassDescription.inputAttachmentCount = 0;
+        subpassDescription.pInputAttachments = nullptr;
+        subpassDescription.preserveAttachmentCount = 0;
+        subpassDescription.pPreserveAttachments = nullptr;
+
+        std::vector<VkSubpassDependency> dependencies(2);
+        dependencies[0].srcSubpass      = VK_SUBPASS_EXTERNAL;
+        dependencies[0].dstSubpass      = 0;
+        dependencies[0].srcStageMask    = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+        dependencies[0].dstStageMask    = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        dependencies[0].srcAccessMask   = VK_ACCESS_MEMORY_READ_BIT;
+        dependencies[0].dstAccessMask   = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+        dependencies[1].srcSubpass      = 0;
+        dependencies[1].dstSubpass      = VK_SUBPASS_EXTERNAL;
+        dependencies[1].srcStageMask    = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        dependencies[1].dstStageMask    = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+        dependencies[1].srcAccessMask   = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        dependencies[1].dstAccessMask   = VK_ACCESS_MEMORY_READ_BIT;
+        dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+        VkRenderPassCreateInfo renderPassInfo;
+        ZeroVulkanStruct(renderPassInfo, VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO);
+        renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+        renderPassInfo.pAttachments    = attachments.data();
+        renderPassInfo.subpassCount    = 1;
+        renderPassInfo.pSubpasses      = &subpassDescription;
+        renderPassInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
+        renderPassInfo.pDependencies   = dependencies.data();
+        VERIFYVULKANRESULT(vkCreateRenderPass(device, &renderPassInfo, VULKAN_CPU_ALLOCATOR, &m_RenderPass));
+   } 
+
 
    VkShaderModule LoadSPIPVShader(const std::string& filepath)
    {
@@ -345,6 +561,30 @@ void DestoryFences()
     }
 }
 
+void CreateDescritorSet()
+{
+    VkDevice device = GetVulkanRHI()->GetDevice()->GetInstanceHandle();
+    
+    VkDescriptorSetAllocateInfo allcoInfo;
+    ZeroVulkanStruct(allcoInfo, VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO);
+    allcoInfo.descriptorPool = m_DescriptorPool;
+    allcoInfo.descriptorSetCount =1 ;
+    allcoInfo.pSetLayouts = &m_DescriptorSetLayout;
+    VERIFYVULKANRESULT(vkAllocateDescriptorSets(device,&allcoInfo,&m_DescriptorSet));
+
+    VkWriteDescriptorSet writeDescriptorSet;
+    ZeroVulkanStruct(writeDescriptorSet,VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
+    
+    writeDescriptorSet.dstSet = m_DescriptorSet;
+    writeDescriptorSet.descriptorCount = 1;
+    writeDescriptorSet.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    writeDescriptorSet.pBufferInfo = &m_MVPDescriptor;
+    writeDescriptorSet.dstBinding = 0;
+    //mark, what is this meanning?
+    vkUpdateDescriptorSets(device,1,&writeDescriptorSet,0,nullptr);
+}
+
+
 void CreateDescriptorSetLayout()
 {
     VkDevice device = GetVulkanRHI()->GetDevice()->GetInstanceHandle();
@@ -429,3 +669,8 @@ bool                            m_Ready = false;
 
     uint32                          m_IndicesCount = 0;
 };
+
+std::shared_ptr<AppModuleBase> CreateAppMode(const std::vector<std::string>& cmdLine)
+{
+    return std::make_shared<TriangleModule>(1400, 900, "Triangle", cmdLine);
+}
