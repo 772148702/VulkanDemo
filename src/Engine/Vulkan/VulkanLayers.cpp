@@ -202,7 +202,7 @@ VulkanLayerExtension::VulkanLayerExtension()
 
 void VulkanLayerExtension::AddUniqueExtensionNames(std::vector<std::string>& outExtensions)
 {
-    for(int32 i=0;i<outExtensions.size();i++)
+    for(int32 i=0;i<extensionProps.size();i++)
     {
         StringUtils::AddUnique(outExtensions,extensionProps[i].extensionName);
     }

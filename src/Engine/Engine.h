@@ -48,6 +48,21 @@ class Engine
     {
         return m_AppInstanceExtensions;
     }
+    
+    void AddAppDeviceExtensions(const char* name)
+    {
+        m_AppDeviceExtensions.push_back(name);
+    }
+
+    void AddAppInstanceExtensions(const char* name)
+    {
+        m_AppInstanceExtensions.push_back(name);
+    }
+
+    FORCE_INLINE void SetPhysicalDeviceFeatures(VkPhysicalDeviceFeatures2* deviceFeatures)
+    {
+        m_PhysicalDeviceFeatures2 = deviceFeatures;
+    }
     protected:
 
     void ParseAppPath(const std::vector<std::string>& cmdLine);

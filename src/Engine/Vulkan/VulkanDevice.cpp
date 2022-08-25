@@ -2,11 +2,15 @@
 #include "Common/Common.h"
 #include "Common/Log.h"
 #include "Core/PixelFormat.h"
+#include "Vulkan/VulkanRHI.h"
 #include "VulkanPlatform.h"
 #include "VulkanGlobals.h"
 #include "VulkanFence.h"
+#include "VulkanQueue.h"
 #include "Application/Application.h"
 #include "vulkan/vulkan_core.h"
+#include <memory>
+#include <stdint.h>
 #include <string>
 #include <vector>
 
@@ -51,6 +55,134 @@ void VulkanDevice::CreateDevice()
 			MLOG("* %s", m_AppDeviceExtensions[i]);
 		}
     }
+
+    VkDeviceCreateInfo deviceInfo;
+    ZeroVulkanStruct(deviceInfo,VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO);
+    deviceInfo.enabledExtensionCount = uint32_t(deviceExtensions.size());
+    deviceInfo.ppEnabledExtensionNames = deviceExtensions.data();
+    deviceInfo.enabledLayerCount =uint32_t(validationLayers.size());
+    deviceInfo.ppEnabledLayerNames = validationLayers.data();
+
+    if(m_PhysicalDeviceFeatures2)
+    {
+        deviceInfo.pNext = m_PhysicalDeviceFeatures2;
+        deviceInfo.pEnabledFeatures =nullptr;
+        m_PhysicalDeviceFeatures2->features = m_PhysicalDeviceFeatures;
+    } else 
+    {
+        deviceInfo.pEnabledFeatures = &m_PhysicalDeviceFeatures;
+    }
+
+    MLOG("Found %d Queue Familes",(int32)m_QueueFamilyProps.size());
+    std::vector<VkDeviceQueueCreateInfo> queueFamilyInfos;
+
+    uint32 numPriorities =0;
+    int32 gfxQueueFamilyIndex=-1;
+    int32 computeQueueFamilyIndex=-1;
+    int32 transferQueueFamilyIndex=-1;
+
+    for(int32 familyIndex=0;familyIndex<m_QueueFamilyProps.size();++familyIndex)
+    {
+        const VkQueueFamilyProperties& curProps = m_QueueFamilyProps[familyIndex];
+        bool isValidQueue = false;
+
+        if((curProps.queueFlags&VK_QUEUE_GRAPHICS_BIT)==VK_QUEUE_GRAPHICS_BIT)
+        {
+            if(gfxQueueFamilyIndex==-1)
+            {
+                gfxQueueFamilyIndex = familyIndex;
+                isValidQueue = true;
+            }
+        }
+
+        if((curProps.queueFlags&VK_QUEUE_COMPUTE_BIT)==VK_QUEUE_COMPUTE_BIT)
+        {
+            if(computeQueueFamilyIndex==-1)
+            {
+                computeQueueFamilyIndex = familyIndex;
+                isValidQueue = true;
+            }
+        }
+
+        if((curProps.queueFlags&VK_QUEUE_TRANSFER_BIT)==VK_QUEUE_TRANSFER_BIT)
+        {
+            if(transferQueueFamilyIndex==-1)
+            {
+                transferQueueFamilyIndex =familyIndex;
+                isValidQueue = true;
+            }
+        }
+
+        auto GetQueueInfoString = [](const VkQueueFamilyProperties& Props)->std::string
+        {
+            std::string info;
+            if((Props.queueFlags&VK_QUEUE_GRAPHICS_BIT)==VK_QUEUE_GRAPHICS_BIT)
+            {
+                info +=" Gfx";
+            }
+            if((Props.queueFlags&VK_QUEUE_COMPUTE_BIT)==VK_QUEUE_COMPUTE_BIT)
+            {
+                info+=" Compute";
+            }
+            if((Props.queueFlags&VK_QUEUE_TRANSFER_BIT)==VK_QUEUE_TRANSFER_BIT)
+            {
+                info+=" Xfer";
+            }
+            return info;
+        };
+        if(!isValidQueue)
+        {
+           MLOG("Skipping unnecessary Queue Family %d: %d queues%s", familyIndex, curProps.queueCount, GetQueueInfoString(curProps).c_str());
+			continue;
+        }
+
+        VkDeviceQueueCreateInfo currQueue;
+        ZeroVulkanStruct(currQueue, VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO);
+		currQueue.queueFamilyIndex = familyIndex;
+		currQueue.queueCount       = curProps.queueCount;
+		numPriorities             += curProps.queueCount;
+		queueFamilyInfos.push_back(currQueue);
+        
+		MLOG("Initializing Queue Family %d: %d queues%s", familyIndex,  curProps.queueCount, GetQueueInfoString(curProps).c_str());
+    }
+
+    std::vector<float> queuePriorities(numPriorities);
+    float* CurrentPriority = queuePriorities.data();
+    for(int32 index=0;index<queueFamilyInfos.size();++index)
+    {
+        VkDeviceQueueCreateInfo& currQueue = queueFamilyInfos[index];
+        currQueue.pQueuePriorities = CurrentPriority;
+        const VkQueueFamilyProperties& currProps = m_QueueFamilyProps[currQueue.queueFamilyIndex];
+        for(int32 queueIndex=0;queueIndex<(int32)currProps.queueCount;++queueIndex)
+        {
+            *CurrentPriority++=1.0f;
+        }
+    }
+
+    deviceInfo.queueCreateInfoCount = uint32_t(queueFamilyInfos.size());
+    deviceInfo.pQueueCreateInfos = queueFamilyInfos.data();
+
+    VkResult result = vkCreateDevice(m_PhysicalDevice,&deviceInfo,VULKAN_CPU_ALLOCATOR,&m_Device);
+    if(result==VK_ERROR_INITIALIZATION_FAILED)
+    {
+ 		MLOG("%s", "Cannot create a Vulkan device. Try updating your video driver to a more recent version.\n");
+		return;
+    }
+
+    m_GfxQueue = std::make_shared<VulkanQueue>(this,gfxQueueFamilyIndex);
+
+    if(computeQueueFamilyIndex==-1)
+    {
+        computeQueueFamilyIndex =gfxQueueFamilyIndex;
+    }
+    m_ComputeQueue = std::make_shared<VulkanQueue>(this,computeQueueFamilyIndex);
+
+    if(transferQueueFamilyIndex==-1)
+    {
+        transferQueueFamilyIndex=computeQueueFamilyIndex;
+    }
+    m_TransferQueue = std::make_shared<VulkanQueue>(this,transferQueueFamilyIndex);
+
 }
 
 void VulkanDevice::Destroy()

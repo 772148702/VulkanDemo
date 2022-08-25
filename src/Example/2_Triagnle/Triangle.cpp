@@ -42,6 +42,51 @@ public:
         return true;
     }
 
+
+    virtual bool Init() override
+    {
+        CreateDepthStencil();
+        CreateRenderPass();
+        CreateFrameBuffers();
+        CreateSemaphores();
+        CreateFences();
+        CreateCommandBuffers();
+        CreateMeshBuffers();
+        CreateUniformBuffers();
+        CreateDescriptorPool();
+        CreateDescriptorSetLayout();
+        CreateDescriptorSet();
+        CreatePipelines();
+        SetupCommandBuffers();
+
+        m_Ready = true;
+
+        return true;
+    }
+
+    virtual void Exist() override
+    {
+        DestroyFrameBuffers();
+        DestoryRenderPass();
+        DestoryDepthStencil();
+        DestroyCommandBuffers();
+        DestroyDescriptorSetLayout();
+        DestroyDescriptorPool();
+        DestroyPipelines();
+        DestroyUniformBuffers();
+        DestroyMeshBuffers();
+        DestorySemaphores();
+        DestroyFences();
+    }
+    
+    virtual void Loop(float time, float delta) override
+    {
+        if (!m_Ready)
+        {
+            return;
+        }
+        Draw(time, delta);
+    }
 private:
 
     struct GPUBuffer
@@ -73,6 +118,172 @@ private:
         Matrix4x4 projection;
     };
 
+    void CreateFrameBuffers() override
+    {
+        DestroyFrameBuffers();
+
+        int32 fwidth    = GetVulkanRHI()->GetSwapChain()->GetWidth();
+        int32 fheight   = GetVulkanRHI()->GetSwapChain()->GetHeight();
+        VkDevice device = GetVulkanRHI()->GetDevice()->GetInstanceHandle();
+
+        VkImageView attachments[2];
+        attachments[1] = m_DepthStencilView;
+
+        VkFramebufferCreateInfo frameBufferCreateInfo;
+        ZeroVulkanStruct(frameBufferCreateInfo, VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO);
+        frameBufferCreateInfo.renderPass      = m_RenderPass;
+        frameBufferCreateInfo.attachmentCount = 2;
+        frameBufferCreateInfo.pAttachments    = attachments;
+        frameBufferCreateInfo.width           = fwidth;
+        frameBufferCreateInfo.height          = fheight;
+        frameBufferCreateInfo.layers          = 1;
+
+        const std::vector<VkImageView>& backbufferViews = GetVulkanRHI()->GetBackbufferViews();
+
+        m_FrameBuffers.resize(backbufferViews.size());
+        for (uint32 i = 0; i < m_FrameBuffers.size(); ++i)
+        {
+            attachments[0] = backbufferViews[i];
+            VERIFYVULKANRESULT(vkCreateFramebuffer(device, &frameBufferCreateInfo, VULKAN_CPU_ALLOCATOR, &m_FrameBuffers[i]));
+        }
+    }
+  void CreatePipelines()
+  {
+      VkDevice device = GetVulkanRHI()->GetDevice()->GetInstanceHandle();
+    
+      VkPipelineCacheCreateInfo createInfo;
+      ZeroVulkanStruct(createInfo,VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO);
+      VERIFYVULKANRESULT(vkCreatePipelineCache(device,&createInfo,VULKAN_CPU_ALLOCATOR,&m_PipelineCache));
+
+      VkPipelineInputAssemblyStateCreateInfo inputAssemblyState;
+      ZeroVulkanStruct(inputAssemblyState,VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO);
+      inputAssemblyState.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+
+      VkPipelineRasterizationStateCreateInfo rasterStateCreateInfo;
+      ZeroVulkanStruct(rasterStateCreateInfo,VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO);
+      rasterStateCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
+      rasterStateCreateInfo.cullMode = VK_CULL_MODE_NONE;
+      rasterStateCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+      rasterStateCreateInfo.depthClampEnable = VK_FALSE;
+      rasterStateCreateInfo.rasterizerDiscardEnable = VK_FALSE;
+      rasterStateCreateInfo.depthBiasEnable = VK_FALSE;
+      rasterStateCreateInfo.lineWidth = 1.0f;
+
+      VkPipelineColorBlendAttachmentState blendAttachmentState[1]={};
+       blendAttachmentState[0].colorWriteMask = (
+            VK_COLOR_COMPONENT_R_BIT |
+            VK_COLOR_COMPONENT_G_BIT |
+            VK_COLOR_COMPONENT_B_BIT |
+            VK_COLOR_COMPONENT_A_BIT
+        );
+       blendAttachmentState[0].blendEnable = VK_FALSE;
+
+       
+        VkPipelineColorBlendStateCreateInfo colorBlendState;
+        ZeroVulkanStruct(colorBlendState, VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO);
+        colorBlendState.attachmentCount = 1;
+        colorBlendState.pAttachments    = blendAttachmentState;
+
+        VkPipelineViewportStateCreateInfo viewportState;
+        ZeroVulkanStruct(viewportState, VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO);
+        viewportState.viewportCount = 1;
+        viewportState.scissorCount  = 1;
+
+
+        std::vector<VkDynamicState> dynamicStateEnables;
+        dynamicStateEnables.push_back(VK_DYNAMIC_STATE_VIEWPORT);
+        dynamicStateEnables.push_back(VK_DYNAMIC_STATE_SCISSOR);
+        VkPipelineDynamicStateCreateInfo dynamicState;
+        ZeroVulkanStruct(dynamicState, VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO);
+        dynamicState.dynamicStateCount = (uint32_t)dynamicStateEnables.size();
+        dynamicState.pDynamicStates    = dynamicStateEnables.data();
+
+
+       VkPipelineDepthStencilStateCreateInfo depthStencilState;
+        ZeroVulkanStruct(depthStencilState, VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO);
+        depthStencilState.depthTestEnable       = VK_TRUE;
+        depthStencilState.depthWriteEnable      = VK_TRUE;
+        depthStencilState.depthCompareOp        = VK_COMPARE_OP_LESS_OR_EQUAL;
+        depthStencilState.depthBoundsTestEnable = VK_FALSE;
+        depthStencilState.back.failOp           = VK_STENCIL_OP_KEEP;
+        depthStencilState.back.passOp           = VK_STENCIL_OP_KEEP;
+        depthStencilState.back.compareOp        = VK_COMPARE_OP_ALWAYS;
+        depthStencilState.stencilTestEnable     = VK_FALSE;
+        depthStencilState.front                 = depthStencilState.back;
+
+        VkPipelineMultisampleStateCreateInfo multisampleState;
+        ZeroVulkanStruct(multisampleState, VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO);
+        multisampleState.rasterizationSamples = m_SampleCount;
+        multisampleState.pSampleMask          = nullptr;
+
+        // (triangle.vert):
+        // layout (location = 0) in vec3 inPos;
+        // layout (location = 1) in vec3 inColor;
+        // Attribute location 0: Position
+        // Attribute location 1: Color
+        // vertex input bindding
+        VkVertexInputBindingDescription vertexInputBinding = {};
+        vertexInputBinding.binding   = 0; // Vertex Buffer 0
+        vertexInputBinding.stride    = sizeof(Vertex); // Position + Color
+        vertexInputBinding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+        std::vector<VkVertexInputAttributeDescription> vertexInputAttributs(2);
+        // position
+        vertexInputAttributs[0].binding  = 0;
+        vertexInputAttributs[0].location = 0; // triangle.vert : layout (location = 0)
+        vertexInputAttributs[0].format   = VK_FORMAT_R32G32B32_SFLOAT;
+        vertexInputAttributs[0].offset   = 0;
+        // color
+        vertexInputAttributs[1].binding  = 0;
+        vertexInputAttributs[1].location = 1; // triangle.vert : layout (location = 1)
+        vertexInputAttributs[1].format   = VK_FORMAT_R32G32B32_SFLOAT;
+        vertexInputAttributs[1].offset   = 12;
+
+        VkPipelineVertexInputStateCreateInfo vertexInputState;
+        ZeroVulkanStruct(vertexInputState, VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO);
+        vertexInputState.vertexBindingDescriptionCount   = 1;
+        vertexInputState.pVertexBindingDescriptions      = &vertexInputBinding;
+        vertexInputState.vertexAttributeDescriptionCount = 2;
+        vertexInputState.pVertexAttributeDescriptions    = vertexInputAttributs.data();
+
+
+         std::vector<VkPipelineShaderStageCreateInfo> shaderStages(2);
+        ZeroVulkanStruct(shaderStages[0], VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);
+        ZeroVulkanStruct(shaderStages[1], VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);
+        shaderStages[0].stage  = VK_SHADER_STAGE_VERTEX_BIT;
+        shaderStages[0].module = LoadSPIPVShader("assets/shaders/2_Triangle/triangle.vert.spv");
+        shaderStages[0].pName  = "main";
+        shaderStages[1].stage  = VK_SHADER_STAGE_FRAGMENT_BIT;
+        shaderStages[1].module = LoadSPIPVShader("assets/shaders/2_Triangle/triangle.frag.spv");
+        shaderStages[1].pName  = "main";
+
+        VkGraphicsPipelineCreateInfo pipelineCreateInfo;
+        ZeroVulkanStruct(pipelineCreateInfo, VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO);
+        pipelineCreateInfo.layout               = m_PipelineLayout;
+        pipelineCreateInfo.renderPass           = m_RenderPass;
+        pipelineCreateInfo.stageCount           = (uint32_t)shaderStages.size();
+        pipelineCreateInfo.pStages              = shaderStages.data();
+        pipelineCreateInfo.pVertexInputState    = &vertexInputState;
+        pipelineCreateInfo.pInputAssemblyState  = &inputAssemblyState;
+        pipelineCreateInfo.pRasterizationState  = &rasterStateCreateInfo;
+        pipelineCreateInfo.pColorBlendState     = &colorBlendState;
+        pipelineCreateInfo.pMultisampleState    = &multisampleState;
+        pipelineCreateInfo.pViewportState       = &viewportState;
+        pipelineCreateInfo.pDepthStencilState   = &depthStencilState;
+        pipelineCreateInfo.pDynamicState        = &dynamicState;
+        VERIFYVULKANRESULT(vkCreateGraphicsPipelines(device, m_PipelineCache, 1, &pipelineCreateInfo, VULKAN_CPU_ALLOCATOR, &m_Pipeline));
+
+        vkDestroyShaderModule(device, shaderStages[0].module, VULKAN_CPU_ALLOCATOR);
+        vkDestroyShaderModule(device, shaderStages[1].module, VULKAN_CPU_ALLOCATOR);
+
+  }
+
+    void DestroyPipelines()
+    {
+        VkDevice device = GetVulkanRHI()->GetDevice()->GetInstanceHandle();
+        vkDestroyPipeline(device, m_Pipeline, VULKAN_CPU_ALLOCATOR);
+        vkDestroyPipelineCache(device, m_PipelineCache, VULKAN_CPU_ALLOCATOR);
+    }
 
    void CreateFrameBuffer()
    {
@@ -116,7 +327,7 @@ private:
         ZeroVulkanStruct(imageCreateInfo, VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO);
         imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
         imageCreateInfo.format = PixelFormatToVkFormat(m_DepthFormat, false);
-        imageCreateInfo.extent = {(uint32)fwidth,(uint32)fheight};
+        imageCreateInfo.extent = {(uint32)fwidth,(uint32)fheight,1};
         imageCreateInfo.mipLevels = 1;
         imageCreateInfo.arrayLayers = 1;
         imageCreateInfo.samples = m_SampleCount;
@@ -151,7 +362,7 @@ private:
         vkAllocateMemory(device,&memAllocateInfo,VULKAN_CPU_ALLOCATOR,&m_DepthStencilMemory);
         vkBindImageMemory(device,m_DepthStencilImage,m_DepthStencilMemory,0);
 
-        vkCreateImageView(device,&imageViewCreateInfo,VULKAN_CPU_ALLOCATOR,&m_DepthStencilView);
+        VERIFYVULKANRESULT(vkCreateImageView(device, &imageViewCreateInfo, VULKAN_CPU_ALLOCATOR, &m_DepthStencilView));
    }
 
    void SetupCommandBuffers()
@@ -286,6 +497,15 @@ private:
         VERIFYVULKANRESULT(vkCreateRenderPass(device, &renderPassInfo, VULKAN_CPU_ALLOCATOR, &m_RenderPass));
    } 
 
+    void DestoryRenderPass() override
+    {
+        VkDevice device = GetVulkanRHI()->GetDevice()->GetInstanceHandle();
+        if (m_RenderPass != VK_NULL_HANDLE)
+        {
+            vkDestroyRenderPass(device, m_RenderPass, VULKAN_CPU_ALLOCATOR);
+            m_RenderPass = VK_NULL_HANDLE;
+        }
+    }
 
    VkShaderModule LoadSPIPVShader(const std::string& filepath)
    {
@@ -308,8 +528,36 @@ private:
 
   void Draw(float time,float delta)
   {
-    
+      UpdateUniformBuffer(time,  delta);
+
+      VkQueue queue = GetVulkanRHI()->GetDevice()->GetPresentQueue()->GetHandle();
+      VkDevice device = GetVulkanRHI()->GetDevice()->GetInstanceHandle();
+
+      int32 backBufferIndex = GetVulkanRHI()->GetSwapChain()->AcquireImageIndex(&m_PresentComplete);  
+      VkPipelineStageFlags waitStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+      VkSubmitInfo submitInfo ={};
+      submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+      submitInfo.pWaitDstStageMask = &waitStageMask;
+      submitInfo.pWaitSemaphores = &m_PresentComplete;
+      submitInfo.waitSemaphoreCount = 1;
+      submitInfo.pSignalSemaphores =&m_RenderComplete;
+      submitInfo.signalSemaphoreCount = 1;
+      submitInfo.pCommandBuffers = &(m_CommandBuffers[backBufferIndex]);
+      submitInfo.commandBufferCount = 1;
+
+      vkResetFences(device,1,&(m_Fences[backBufferIndex]));
+      VERIFYVULKANRESULT( vkQueueSubmit(queue,1,&submitInfo,m_Fences[backBufferIndex]));
+      vkWaitForFences(device,1,&(m_Fences[backBufferIndex]),true,200*1000*1000);
+
+      // present
+      GetVulkanRHI()->GetSwapChain()->Present(
+        GetVulkanRHI()->GetDevice()->GetGraphicsQueue(),
+        GetVulkanRHI()->GetDevice()->GetPresentQueue(),
+        &m_RenderComplete);
   }
+
+
 
 
   void UpdateUniformBuffer(float time,float delta)
@@ -367,7 +615,7 @@ void CreateMeshBuffers()
     ZeroVulkanStruct(vertexBufferInfo,VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO);
     vertexBufferInfo.size = vertices.size()* sizeof(Vertex);
     vertexBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-    VERIFYVULKANRESULT( vkCreateBuffer(device,&vertexBufferInfo,VULKAN_CPU_ALLOCATOR,&tempIndexBuffer.buffer));
+    VERIFYVULKANRESULT( vkCreateBuffer(device,&vertexBufferInfo,VULKAN_CPU_ALLOCATOR,&tempVertexBuffer.buffer));
 
     vkGetBufferMemoryRequirements(device,tempVertexBuffer.buffer,&memReqInfo);
     uint32 memoryTypeIndex = 0;
@@ -466,7 +714,7 @@ void CreateMeshBuffers()
     vkFreeMemory(device, tempIndexBuffer.memory, VULKAN_CPU_ALLOCATOR);
 }
 
-void DestoryMeshBuffers()
+void DestroyMeshBuffers()
 {
     VkDevice device = GetVulkanRHI()->GetDevice()->GetInstanceHandle();
     vkDestroyBuffer(device, m_VertexBuffer.buffer, VULKAN_CPU_ALLOCATOR);
@@ -475,11 +723,12 @@ void DestoryMeshBuffers()
     vkFreeMemory(device, m_IndicesBuffer.memory, VULKAN_CPU_ALLOCATOR);
 }
 
-void CreateUniformBuffer()
+void CreateUniformBuffers()
 {
     VkDevice device  = GetVulkanRHI()->GetDevice()->GetInstanceHandle();
 
     VkBufferCreateInfo bufferInfo;
+    ZeroVulkanStruct(bufferInfo, VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO);
     bufferInfo.size = sizeof(UBOData);
     bufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
     VERIFYVULKANRESULT(vkCreateBuffer(device,&bufferInfo,VULKAN_CPU_ALLOCATOR,&m_MVPBuffer.buffer));
@@ -513,7 +762,7 @@ void CreateUniformBuffer()
     m_MVPData.projection.Perspective(MMath::DegreesToRadians(75.0f), (float)GetWidth(), (float)GetHeight(), 0.01f, 3000.0f);
 }
 
-void DestoryUniformBuffers()
+void DestroyUniformBuffers()
 {
     VkDevice device = GetVulkanRHI()->GetDevice()->GetInstanceHandle();
     vkDestroyBuffer(device,m_MVPBuffer.buffer,VULKAN_CPU_ALLOCATOR);
@@ -552,7 +801,7 @@ void CreateFences()
     }
 }
 
-void DestoryFences()
+void DestroyFences()
 {
     VkDevice device = GetVulkanRHI()->GetDevice()->GetInstanceHandle();
     for(int32 i=0;i<m_Fences.size();i++)
@@ -561,7 +810,28 @@ void DestoryFences()
     }
 }
 
-void CreateDescritorSet()
+void CreateDescriptorPool()
+{
+    VkDevice device = GetVulkanRHI()->GetDevice()->GetInstanceHandle();
+
+    VkDescriptorPoolSize poolSize = {};
+    poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    poolSize.descriptorCount=1;
+    
+    VkDescriptorPoolCreateInfo descriptorPoolInfo;
+    ZeroVulkanStruct(descriptorPoolInfo,VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO);
+    descriptorPoolInfo.poolSizeCount = 1;
+    descriptorPoolInfo.pPoolSizes =&poolSize;
+    descriptorPoolInfo.maxSets = 1;
+    VERIFYVULKANRESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, VULKAN_CPU_ALLOCATOR, &m_DescriptorPool));
+}
+
+void DestroyDescriptorPool()
+{
+    vkDestroyDescriptorPool(GetVulkanRHI()->GetDevice()->GetInstanceHandle(), m_DescriptorPool, VULKAN_CPU_ALLOCATOR);
+}
+
+void CreateDescriptorSet()
 {
     VkDevice device = GetVulkanRHI()->GetDevice()->GetInstanceHandle();
     
@@ -609,6 +879,13 @@ void CreateDescriptorSetLayout()
     VERIFYVULKANRESULT(vkCreatePipelineLayout(device, &pipeLayoutInfo, VULKAN_CPU_ALLOCATOR, &m_PipelineLayout));
 }
 
+void DestroyDescriptorSetLayout()
+{
+    VkDevice device = GetVulkanRHI()->GetDevice()->GetInstanceHandle();
+    vkDestroyDescriptorSetLayout(device, m_DescriptorSetLayout, VULKAN_CPU_ALLOCATOR);
+    vkDestroyPipelineLayout(device, m_PipelineLayout, VULKAN_CPU_ALLOCATOR);
+}
+
 void CreateCommandBuffers()
 {
     VkDevice device = GetVulkanRHI()->GetDevice()->GetInstanceHandle();
@@ -630,6 +907,17 @@ void CreateCommandBuffers()
     {
         vkAllocateCommandBuffers(device, &cmdBufferInfo, &(m_CommandBuffers[i]));
     }
+}
+
+void DestroyCommandBuffers()
+{
+    VkDevice device = GetVulkanRHI()->GetDevice()->GetInstanceHandle();
+    for (int32 i = 0; i < m_CommandBuffers.size(); ++i)
+    {
+        vkFreeCommandBuffers(device, m_CommandPool, 1, &(m_CommandBuffers[i]));
+    }
+
+    vkDestroyCommandPool(device, m_CommandPool, VULKAN_CPU_ALLOCATOR);
 }
 
 private:
