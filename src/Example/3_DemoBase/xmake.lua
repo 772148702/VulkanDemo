@@ -1,7 +1,4 @@
-
-
-
-target("2_Triangle")
+target("3_DemoBase")
 set_kind("binary")
 add_files("/*.cpp")
 add_links(links_list)
