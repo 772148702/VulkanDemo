@@ -34,7 +34,8 @@ namespace vk_demo
 
     public:
         static DVKTexture*  texture2D;
-        static DVKModel*    fullQuad;
+        //todo
+        //static DVKModel*    fullQuad;
 
     };
 

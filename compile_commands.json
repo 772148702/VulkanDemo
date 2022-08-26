@@ -1,196 +1,211 @@
 [
 {
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Application\\Application.cpp.obj", "src\\Engine\\Application\\Application.cpp"],
-  "file": "src\\Engine\\Application\\Application.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Application\\GenericApplication.cpp.obj", "src\\Engine\\Application\\GenericApplication.cpp"],
-  "file": "src\\Engine\\Application\\GenericApplication.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Application\\GenericWindow.cpp.obj", "src\\Engine\\Application\\GenericWindow.cpp"],
-  "file": "src\\Engine\\Application\\GenericWindow.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Application\\Windows\\WinApplication.cpp.obj", "src\\Engine\\Application\\Windows\\WinApplication.cpp"],
-  "file": "src\\Engine\\Application\\Windows\\WinApplication.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Application\\Windows\\WinWindow.cpp.obj", "src\\Engine\\Application\\Windows\\WinWindow.cpp"],
-  "file": "src\\Engine\\Application\\Windows\\WinWindow.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Core\\PixelFormat.cpp.obj", "src\\Engine\\Core\\PixelFormat.cpp"],
-  "file": "src\\Engine\\Core\\PixelFormat.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Demo\\DemoBase.cpp.obj", "src\\Engine\\Demo\\DemoBase.cpp"],
-  "file": "src\\Engine\\Demo\\DemoBase.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Demo\\DVKBuffer.cpp.obj", "src\\Engine\\Demo\\DVKBuffer.cpp"],
-  "file": "src\\Engine\\Demo\\DVKBuffer.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Demo\\DVKCommand.cpp.obj", "src\\Engine\\Demo\\DVKCommand.cpp"],
-  "file": "src\\Engine\\Demo\\DVKCommand.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Demo\\DVKDefaultRes.cpp.obj", "src\\Engine\\Demo\\DVKDefaultRes.cpp"],
-  "file": "src\\Engine\\Demo\\DVKDefaultRes.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Demo\\DVKIndexBuffer.cpp.obj", "src\\Engine\\Demo\\DVKIndexBuffer.cpp"],
-  "file": "src\\Engine\\Demo\\DVKIndexBuffer.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Demo\\DVKPipeline.cpp.obj", "src\\Engine\\Demo\\DVKPipeline.cpp"],
-  "file": "src\\Engine\\Demo\\DVKPipeline.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Demo\\DVKShader.cpp.obj", "src\\Engine\\Demo\\DVKShader.cpp"],
-  "file": "src\\Engine\\Demo\\DVKShader.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Demo\\DVKTexture.cpp.obj", "src\\Engine\\Demo\\DVKTexture.cpp"],
-  "file": "src\\Engine\\Demo\\DVKTexture.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Demo\\FileManager.cpp.obj", "src\\Engine\\Demo\\FileManager.cpp"],
-  "file": "src\\Engine\\Demo\\FileManager.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Engine.cpp.obj", "src\\Engine\\Engine.cpp"],
-  "file": "src\\Engine\\Engine.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\GenericPlatform\\InputManager.cpp.obj", "src\\Engine\\GenericPlatform\\InputManager.cpp"],
-  "file": "src\\Engine\\GenericPlatform\\InputManager.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\GenericPlatform\\Windows\\InputManagerWindows.cpp.obj", "src\\Engine\\GenericPlatform\\Windows\\InputManagerWindows.cpp"],
-  "file": "src\\Engine\\GenericPlatform\\Windows\\InputManagerWindows.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\GenericPlatform\\Windows\\WindowsPlatformTime.cpp.obj", "src\\Engine\\GenericPlatform\\Windows\\WindowsPlatformTime.cpp"],
-  "file": "src\\Engine\\GenericPlatform\\Windows\\WindowsPlatformTime.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Launch\\Launch.cpp.obj", "src\\Engine\\Launch\\Launch.cpp"],
-  "file": "src\\Engine\\Launch\\Launch.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Loader\\ImageLoader.cpp.obj", "src\\Engine\\Loader\\ImageLoader.cpp"],
-  "file": "src\\Engine\\Loader\\ImageLoader.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\main.cpp.obj", "src\\Engine\\main.cpp"],
-  "file": "src\\Engine\\main.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Math\\Color.cpp.obj", "src\\Engine\\Math\\Color.cpp"],
-  "file": "src\\Engine\\Math\\Color.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Math\\GenericPlatformMath.cpp.obj", "src\\Engine\\Math\\GenericPlatformMath.cpp"],
-  "file": "src\\Engine\\Math\\GenericPlatformMath.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Math\\Math.cpp.obj", "src\\Engine\\Math\\Math.cpp"],
-  "file": "src\\Engine\\Math\\Math.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Utils\\Crc.cpp.obj", "src\\Engine\\Utils\\Crc.cpp"],
-  "file": "src\\Engine\\Utils\\Crc.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Utils\\SecureHash.cpp.obj", "src\\Engine\\Utils\\SecureHash.cpp"],
-  "file": "src\\Engine\\Utils\\SecureHash.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Vulkan\\VulkanDebug.cpp.obj", "src\\Engine\\Vulkan\\VulkanDebug.cpp"],
-  "file": "src\\Engine\\Vulkan\\VulkanDebug.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Vulkan\\VulkanDevice.cpp.obj", "src\\Engine\\Vulkan\\VulkanDevice.cpp"],
-  "file": "src\\Engine\\Vulkan\\VulkanDevice.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Vulkan\\VulkanFence.cpp.obj", "src\\Engine\\Vulkan\\VulkanFence.cpp"],
-  "file": "src\\Engine\\Vulkan\\VulkanFence.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Vulkan\\VulkanLayers.cpp.obj", "src\\Engine\\Vulkan\\VulkanLayers.cpp"],
-  "file": "src\\Engine\\Vulkan\\VulkanLayers.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Vulkan\\VulkanMemory.cpp.obj", "src\\Engine\\Vulkan\\VulkanMemory.cpp"],
-  "file": "src\\Engine\\Vulkan\\VulkanMemory.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Vulkan\\VulkanQueue.cpp.obj", "src\\Engine\\Vulkan\\VulkanQueue.cpp"],
-  "file": "src\\Engine\\Vulkan\\VulkanQueue.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Vulkan\\VulkanRHI.cpp.obj", "src\\Engine\\Vulkan\\VulkanRHI.cpp"],
-  "file": "src\\Engine\\Vulkan\\VulkanRHI.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Vulkan\\VulkanSwapChain.cpp.obj", "src\\Engine\\Vulkan\\VulkanSwapChain.cpp"],
-  "file": "src\\Engine\\Vulkan\\VulkanSwapChain.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\Vulkan.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\debug\\src\\Engine\\Vulkan\\Windows\\VulkanWindowsPlatform.cpp.obj", "src\\Engine\\Vulkan\\Windows\\VulkanWindowsPlatform.cpp"],
-  "file": "src\\Engine\\Vulkan\\Windows\\VulkanWindowsPlatform.cpp"
-},
-{
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\compile.3_DemoBase.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\3_DemoBase\\windows\\x64\\debug\\src\\Example\\3_DemoBase\\Triangle.cpp.obj", "src\\Example\\3_DemoBase\\Triangle.cpp"],
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\3_DemoBase\\windows\\x64\\release\\src\\Example\\3_DemoBase\\Triangle.cpp.obj", "src\\Example\\3_DemoBase\\Triangle.cpp"],
   "file": "src\\Example\\3_DemoBase\\Triangle.cpp"
 },
 {
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\compile.2_Triangle.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\2_Triangle\\windows\\x64\\debug\\src\\Example\\2_Triagnle\\LaunchWindows.cpp.obj", "src\\Example\\2_Triagnle\\LaunchWindows.cpp"],
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\2_Triangle\\windows\\x64\\release\\src\\Example\\2_Triagnle\\LaunchWindows.cpp.obj", "src\\Example\\2_Triagnle\\LaunchWindows.cpp"],
   "file": "src\\Example\\2_Triagnle\\LaunchWindows.cpp"
 },
 {
-  "directory": "F:\\VulkanDemo",
-  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Tools\\MSVC\\14.30.30705\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Zi", "/FS", "/Fdf:\\VulkanDemo\\build\\windows\\x64\\debug\\compile.2_Triangle.pdb", "/Od", "/std:c++17", "/IF:\\VulkanDemo\\external\\vulkan\\windows\\include", "/IF:\\VulkanDemo\\external\\imgui", "/IF:\\VulkanDemo\\external\\SPIRV-Cross", "/IF:\\VulkanDemo\\external\\assimp\\include", "/IF:\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/Fof:\\VulkanDemo\\build\\.objs\\2_Triangle\\windows\\x64\\debug\\src\\Example\\2_Triagnle\\Triangle.cpp.obj", "src\\Example\\2_Triagnle\\Triangle.cpp"],
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\2_Triangle\\windows\\x64\\release\\src\\Example\\2_Triagnle\\Triangle.cpp.obj", "src\\Example\\2_Triagnle\\Triangle.cpp"],
   "file": "src\\Example\\2_Triagnle\\Triangle.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Application\\Application.cpp.obj", "src\\Engine\\Application\\Application.cpp"],
+  "file": "src\\Engine\\Application\\Application.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Application\\GenericApplication.cpp.obj", "src\\Engine\\Application\\GenericApplication.cpp"],
+  "file": "src\\Engine\\Application\\GenericApplication.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Application\\GenericWindow.cpp.obj", "src\\Engine\\Application\\GenericWindow.cpp"],
+  "file": "src\\Engine\\Application\\GenericWindow.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Application\\Windows\\WinApplication.cpp.obj", "src\\Engine\\Application\\Windows\\WinApplication.cpp"],
+  "file": "src\\Engine\\Application\\Windows\\WinApplication.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Application\\Windows\\WinWindow.cpp.obj", "src\\Engine\\Application\\Windows\\WinWindow.cpp"],
+  "file": "src\\Engine\\Application\\Windows\\WinWindow.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Core\\PixelFormat.cpp.obj", "src\\Engine\\Core\\PixelFormat.cpp"],
+  "file": "src\\Engine\\Core\\PixelFormat.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Demo\\DemoBase.cpp.obj", "src\\Engine\\Demo\\DemoBase.cpp"],
+  "file": "src\\Engine\\Demo\\DemoBase.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Demo\\DVKBuffer.cpp.obj", "src\\Engine\\Demo\\DVKBuffer.cpp"],
+  "file": "src\\Engine\\Demo\\DVKBuffer.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Demo\\DVKCommand.cpp.obj", "src\\Engine\\Demo\\DVKCommand.cpp"],
+  "file": "src\\Engine\\Demo\\DVKCommand.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Demo\\DVKDefaultRes.cpp.obj", "src\\Engine\\Demo\\DVKDefaultRes.cpp"],
+  "file": "src\\Engine\\Demo\\DVKDefaultRes.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Demo\\DVKIndexBuffer.cpp.obj", "src\\Engine\\Demo\\DVKIndexBuffer.cpp"],
+  "file": "src\\Engine\\Demo\\DVKIndexBuffer.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Demo\\DVKMaterial.cpp.obj", "src\\Engine\\Demo\\DVKMaterial.cpp"],
+  "file": "src\\Engine\\Demo\\DVKMaterial.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Demo\\DVKModel.cpp.obj", "src\\Engine\\Demo\\DVKModel.cpp"],
+  "file": "src\\Engine\\Demo\\DVKModel.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Demo\\DVKPipeline.cpp.obj", "src\\Engine\\Demo\\DVKPipeline.cpp"],
+  "file": "src\\Engine\\Demo\\DVKPipeline.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Demo\\DVKShader.cpp.obj", "src\\Engine\\Demo\\DVKShader.cpp"],
+  "file": "src\\Engine\\Demo\\DVKShader.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Demo\\DVKTexture.cpp.obj", "src\\Engine\\Demo\\DVKTexture.cpp"],
+  "file": "src\\Engine\\Demo\\DVKTexture.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Demo\\DVKVertexBuffer.cpp.obj", "src\\Engine\\Demo\\DVKVertexBuffer.cpp"],
+  "file": "src\\Engine\\Demo\\DVKVertexBuffer.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Demo\\FileManager.cpp.obj", "src\\Engine\\Demo\\FileManager.cpp"],
+  "file": "src\\Engine\\Demo\\FileManager.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Engine.cpp.obj", "src\\Engine\\Engine.cpp"],
+  "file": "src\\Engine\\Engine.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\GenericPlatform\\InputManager.cpp.obj", "src\\Engine\\GenericPlatform\\InputManager.cpp"],
+  "file": "src\\Engine\\GenericPlatform\\InputManager.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\GenericPlatform\\Windows\\InputManagerWindows.cpp.obj", "src\\Engine\\GenericPlatform\\Windows\\InputManagerWindows.cpp"],
+  "file": "src\\Engine\\GenericPlatform\\Windows\\InputManagerWindows.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\GenericPlatform\\Windows\\WindowsPlatformTime.cpp.obj", "src\\Engine\\GenericPlatform\\Windows\\WindowsPlatformTime.cpp"],
+  "file": "src\\Engine\\GenericPlatform\\Windows\\WindowsPlatformTime.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Launch\\Launch.cpp.obj", "src\\Engine\\Launch\\Launch.cpp"],
+  "file": "src\\Engine\\Launch\\Launch.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Loader\\ImageLoader.cpp.obj", "src\\Engine\\Loader\\ImageLoader.cpp"],
+  "file": "src\\Engine\\Loader\\ImageLoader.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\main.cpp.obj", "src\\Engine\\main.cpp"],
+  "file": "src\\Engine\\main.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Math\\Color.cpp.obj", "src\\Engine\\Math\\Color.cpp"],
+  "file": "src\\Engine\\Math\\Color.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Math\\GenericPlatformMath.cpp.obj", "src\\Engine\\Math\\GenericPlatformMath.cpp"],
+  "file": "src\\Engine\\Math\\GenericPlatformMath.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Math\\Math.cpp.obj", "src\\Engine\\Math\\Math.cpp"],
+  "file": "src\\Engine\\Math\\Math.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Utils\\Crc.cpp.obj", "src\\Engine\\Utils\\Crc.cpp"],
+  "file": "src\\Engine\\Utils\\Crc.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Utils\\SecureHash.cpp.obj", "src\\Engine\\Utils\\SecureHash.cpp"],
+  "file": "src\\Engine\\Utils\\SecureHash.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Vulkan\\VulkanDebug.cpp.obj", "src\\Engine\\Vulkan\\VulkanDebug.cpp"],
+  "file": "src\\Engine\\Vulkan\\VulkanDebug.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Vulkan\\VulkanDevice.cpp.obj", "src\\Engine\\Vulkan\\VulkanDevice.cpp"],
+  "file": "src\\Engine\\Vulkan\\VulkanDevice.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Vulkan\\VulkanFence.cpp.obj", "src\\Engine\\Vulkan\\VulkanFence.cpp"],
+  "file": "src\\Engine\\Vulkan\\VulkanFence.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Vulkan\\VulkanLayers.cpp.obj", "src\\Engine\\Vulkan\\VulkanLayers.cpp"],
+  "file": "src\\Engine\\Vulkan\\VulkanLayers.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Vulkan\\VulkanMemory.cpp.obj", "src\\Engine\\Vulkan\\VulkanMemory.cpp"],
+  "file": "src\\Engine\\Vulkan\\VulkanMemory.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Vulkan\\VulkanQueue.cpp.obj", "src\\Engine\\Vulkan\\VulkanQueue.cpp"],
+  "file": "src\\Engine\\Vulkan\\VulkanQueue.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Vulkan\\VulkanRHI.cpp.obj", "src\\Engine\\Vulkan\\VulkanRHI.cpp"],
+  "file": "src\\Engine\\Vulkan\\VulkanRHI.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Vulkan\\VulkanSwapChain.cpp.obj", "src\\Engine\\Vulkan\\VulkanSwapChain.cpp"],
+  "file": "src\\Engine\\Vulkan\\VulkanSwapChain.cpp"
+},
+{
+  "directory": "D:\\gitproject\\my\\VulkanDemo",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.32.31326\\bin\\HostX64\\x64\\cl.exe", "/c", "/EHsc", "/nologo", "/Ox", "/fp:fast", "/std:c++17", "/ID:\\gitproject\\my\\VulkanDemo\\external\\vulkan\\windows\\include", "/ID:\\gitproject\\my\\VulkanDemo\\external\\imgui", "/ID:\\gitproject\\my\\VulkanDemo\\external\\SPIRV-Cross", "/ID:\\gitproject\\my\\VulkanDemo\\external\\assimp\\include", "/ID:\\gitproject\\my\\VulkanDemo\\src\\Engine", "/DPLATFORM_WINDOWS", "/DNOMINMAX", "/DMONKEY_DEBUG", "/D_WINDOWS", "/DNDEBUG", "/Fod:\\gitproject\\my\\VulkanDemo\\build\\.objs\\Vulkan\\windows\\x64\\release\\src\\Engine\\Vulkan\\Windows\\VulkanWindowsPlatform.cpp.obj", "src\\Engine\\Vulkan\\Windows\\VulkanWindowsPlatform.cpp"],
+  "file": "src\\Engine\\Vulkan\\Windows\\VulkanWindowsPlatform.cpp"
 }]
