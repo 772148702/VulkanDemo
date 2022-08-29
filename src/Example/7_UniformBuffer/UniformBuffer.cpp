@@ -207,21 +207,29 @@ private:
 
     void CreateDescriptorSet()
     {
-        VkDescriptorSetAllocateInfo allocInfo;
+       VkDescriptorSetAllocateInfo allocInfo;
         ZeroVulkanStruct(allocInfo, VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO);
         allocInfo.descriptorPool     = m_DescriptorPool;
         allocInfo.descriptorSetCount = 1;
         allocInfo.pSetLayouts        = &m_DescriptorSetLayout;
         VERIFYVULKANRESULT(vkAllocateDescriptorSets(m_Device, &allocInfo, &m_DescriptorSet));
 
-        VkWriteDescriptorSet writeDescriptorSet;
-        ZeroVulkanStruct(writeDescriptorSet, VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
-        writeDescriptorSet.dstSet          = m_DescriptorSet;
-        writeDescriptorSet.descriptorCount = 1;
-        writeDescriptorSet.descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        writeDescriptorSet.pBufferInfo     = &(m_MVPBuffer->descriptor);
-        writeDescriptorSet.dstBinding      = 0;
-        vkUpdateDescriptorSets(m_Device, 1, &writeDescriptorSet, 0, nullptr);
+        std::vector<VkWriteDescriptorSet> writeDescriptorSets(2);
+        ZeroVulkanStruct(writeDescriptorSets[0], VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
+        writeDescriptorSets[0].dstSet          = m_DescriptorSet;
+        writeDescriptorSets[0].descriptorCount = 1;
+        writeDescriptorSets[0].descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        writeDescriptorSets[0].pBufferInfo     = &(m_MVPBuffer->descriptor);
+        writeDescriptorSets[0].dstBinding      = 0;
+
+        ZeroVulkanStruct(writeDescriptorSets[1], VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
+        writeDescriptorSets[1].dstSet          = m_DescriptorSet;
+        writeDescriptorSets[1].descriptorCount = 1;
+        writeDescriptorSets[1].descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        writeDescriptorSets[1].pBufferInfo     = &(m_ParamsBuffer->descriptor);
+        writeDescriptorSets[1].dstBinding      = 1;
+
+        vkUpdateDescriptorSets(m_Device, 2, writeDescriptorSets.data(), 0, nullptr);
     }
 
     void CreateDescriptorPool()
@@ -370,17 +378,23 @@ private:
 
     void CreateDescriptorSetLayout()
     {
-        VkDescriptorSetLayoutBinding layoutBinding;
-        layoutBinding.binding            = 0;
-        layoutBinding.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        layoutBinding.descriptorCount    = 1;
-        layoutBinding.stageFlags         = VK_SHADER_STAGE_VERTEX_BIT;
-        layoutBinding.pImmutableSamplers = nullptr;
+        std::vector<VkDescriptorSetLayoutBinding> layoutBindings(2);
+        layoutBindings[0].binding            = 0;
+        layoutBindings[0].descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        layoutBindings[0].descriptorCount    = 1;
+        layoutBindings[0].stageFlags         = VK_SHADER_STAGE_VERTEX_BIT;
+        layoutBindings[0].pImmutableSamplers = nullptr;
+
+        layoutBindings[1].binding            = 1;
+        layoutBindings[1].descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        layoutBindings[1].descriptorCount    = 1;
+        layoutBindings[1].stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT;
+        layoutBindings[1].pImmutableSamplers = nullptr;
 
         VkDescriptorSetLayoutCreateInfo descSetLayoutInfo;
         ZeroVulkanStruct(descSetLayoutInfo, VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO);
-        descSetLayoutInfo.bindingCount = 1;
-        descSetLayoutInfo.pBindings    = &layoutBinding;
+        descSetLayoutInfo.bindingCount = 2;
+        descSetLayoutInfo.pBindings    = layoutBindings.data();
         VERIFYVULKANRESULT(vkCreateDescriptorSetLayout(m_Device, &descSetLayoutInfo, VULKAN_CPU_ALLOCATOR, &m_DescriptorSetLayout));
 
         VkPipelineLayoutCreateInfo pipeLayoutInfo;
@@ -403,11 +417,12 @@ private:
         m_MVPData.projection = m_ViewCamera.GetProjection();
 
         m_MVPBuffer->CopyFrom(&m_MVPData, sizeof(UBOMVPData));
+        m_ParamsBuffer->CopyFrom(&m_Params, sizeof(UBOParams));
     }
 
     void CreateUniformBuffers()
     {
-        m_ViewCamera.Perspective(PI / 4, GetWidth(), GetHeight(), 0.1f, 1000.0f);
+      m_ViewCamera.Perspective(PI / 4, GetWidth(), GetHeight(), 0.1f, 1000.0f);
         m_ViewCamera.SetPosition(0, 0, -5.0f);
         m_ViewCamera.LookAt(0, 0, 0);
 
@@ -419,12 +434,28 @@ private:
             &m_MVPData
         );
         m_MVPBuffer->Map();
+
+        m_Params.omega   = 0.25 * PI;
+        m_Params.k       = 10;
+        m_Params.cutoff  = 0.57;
+        m_Params.padding = 0.0f;
+        m_ParamsBuffer = vk_demo::DVKBuffer::CreateBuffer(
+            m_VulkanDevice,
+            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            sizeof(UBOParams),
+            &m_Params
+        );
+        m_ParamsBuffer->Map();
     }
 
     void DestroyUniformBuffers()
     {
         m_MVPBuffer->UnMap();
         delete m_MVPBuffer;
+
+        m_ParamsBuffer->UnMap();
+        delete m_ParamsBuffer;
     }
 
     void CreateMeshBuffers()
@@ -523,6 +554,7 @@ private:
     vk_demo::DVKBuffer*             m_IndexBuffer = nullptr;
     vk_demo::DVKBuffer*             m_VertexBuffer = nullptr;
     vk_demo::DVKBuffer*             m_MVPBuffer = nullptr;
+    vk_demo::DVKBuffer*             m_ParamsBuffer = nullptr;
 
     VkDescriptorSetLayout           m_DescriptorSetLayout = VK_NULL_HANDLE;
     VkDescriptorSet                 m_DescriptorSet = VK_NULL_HANDLE;
