@@ -3,12 +3,12 @@
 
 #include "Demo/DemoBase.h"
 #include "Demo/DVKBuffer.h"
+#include "Demo/DVKCommand.h"
+#include "Demo/DVKUtils.h"
 #include "Demo/DVKCamera.h"
 
 #include "Math/Vector4.h"
 #include "Math/Matrix4x4.h"
-
-#include "Demo/FileManager.h"
 
 #include <vector>
 
@@ -83,24 +83,6 @@ private:
         Matrix4x4 view;
         Matrix4x4 projection;
     };
-
-    VkShaderModule LoadSPIPVShader(const std::string& filepath)
-    {
-        uint8* dataPtr  = nullptr;
-        uint32 dataSize = 0;
-        FileManager::ReadFile(filepath, dataPtr, dataSize);
-
-        VkShaderModuleCreateInfo moduleCreateInfo;
-        ZeroVulkanStruct(moduleCreateInfo, VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO);
-        moduleCreateInfo.codeSize = dataSize;
-        moduleCreateInfo.pCode    = (uint32_t*)dataPtr;
-
-        VkShaderModule shaderModule;
-        VERIFYVULKANRESULT(vkCreateShaderModule(m_Device, &moduleCreateInfo, VULKAN_CPU_ALLOCATOR, &shaderModule));
-        delete[] dataPtr;
-
-        return shaderModule;
-    }
 
     void Draw(float time, float delta)
     {
@@ -301,10 +283,10 @@ private:
         ZeroVulkanStruct(shaderStages[0], VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);
         ZeroVulkanStruct(shaderStages[1], VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);
         shaderStages[0].stage  = VK_SHADER_STAGE_VERTEX_BIT;
-        shaderStages[0].module = LoadSPIPVShader("assets/shaders/2_Triangle/triangle.vert.spv");
+        shaderStages[0].module = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/2_Triangle/triangle.vert.spv");
         shaderStages[0].pName  = "main";
         shaderStages[1].stage  = VK_SHADER_STAGE_FRAGMENT_BIT;
-        shaderStages[1].module = LoadSPIPVShader("assets/shaders/2_Triangle/triangle.frag.spv");
+        shaderStages[1].module = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/2_Triangle/triangle.frag.spv");
         shaderStages[1].pName  = "main";
 
         VkGraphicsPipelineCreateInfo pipelineCreateInfo;
@@ -363,7 +345,6 @@ private:
     void UpdateUniformBuffers(float time, float delta)
     {
         m_MVPData.model.AppendRotation(90.0f * delta, Vector3::UpVector);
-
         m_MVPData.view = m_ViewCamera.GetView();
         m_MVPData.projection = m_ViewCamera.GetProjection();
 
@@ -441,48 +422,20 @@ private:
             indices.size() * sizeof(uint16)
         );
 
-        VkCommandBuffer xferCmdBuffer;
-        // gfx queue自带transfer功能，为了优化需要使用专有的xfer queue。这里为了简单，先将就用。
-        VkCommandBufferAllocateInfo xferCmdBufferInfo;
-        ZeroVulkanStruct(xferCmdBufferInfo, VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO);
-        xferCmdBufferInfo.commandPool        = m_CommandPool;
-        xferCmdBufferInfo.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        xferCmdBufferInfo.commandBufferCount = 1;
-        VERIFYVULKANRESULT(vkAllocateCommandBuffers(m_Device, &xferCmdBufferInfo, &xferCmdBuffer));
-
-        // 开始录制命令
-        VkCommandBufferBeginInfo cmdBufferBeginInfo;
-        ZeroVulkanStruct(cmdBufferBeginInfo, VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO);
-        VERIFYVULKANRESULT(vkBeginCommandBuffer(xferCmdBuffer, &cmdBufferBeginInfo));
+        vk_demo::DVKCommandBuffer* cmdBuffer = vk_demo::DVKCommandBuffer::Create(m_VulkanDevice, m_CommandPool);
+        cmdBuffer->Begin();
 
         VkBufferCopy copyRegion = {};
         copyRegion.size = vertices.size() * sizeof(Vertex);
-        vkCmdCopyBuffer(xferCmdBuffer, vertStaging->buffer, m_VertexBuffer->buffer, 1, &copyRegion);
+        vkCmdCopyBuffer(cmdBuffer->cmdBuffer, vertStaging->buffer, m_VertexBuffer->buffer, 1, &copyRegion);
 
         copyRegion.size = indices.size() * sizeof(uint16);
-        vkCmdCopyBuffer(xferCmdBuffer, idexStaging->buffer, m_IndexBuffer->buffer, 1, &copyRegion);
+        vkCmdCopyBuffer(cmdBuffer->cmdBuffer, idexStaging->buffer, m_IndexBuffer->buffer, 1, &copyRegion);
 
-        // 结束录制
-        VERIFYVULKANRESULT(vkEndCommandBuffer(xferCmdBuffer));
+        cmdBuffer->End();
+        cmdBuffer->Submit();
 
-        // 提交命令，并且等待命令执行完毕。
-        VkSubmitInfo submitInfo;
-        ZeroVulkanStruct(submitInfo, VK_STRUCTURE_TYPE_SUBMIT_INFO);
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers    = &xferCmdBuffer;
-
-        VkFenceCreateInfo fenceInfo;
-        ZeroVulkanStruct(fenceInfo, VK_STRUCTURE_TYPE_FENCE_CREATE_INFO);
-        fenceInfo.flags = 0;
-
-        VkFence fence = VK_NULL_HANDLE;
-        VERIFYVULKANRESULT(vkCreateFence(m_Device, &fenceInfo, VULKAN_CPU_ALLOCATOR, &fence));
-        VERIFYVULKANRESULT(vkQueueSubmit(m_GfxQueue, 1, &submitInfo, fence));
-        VERIFYVULKANRESULT(vkWaitForFences(m_Device, 1, &fence, VK_TRUE, MAX_int64));
-
-        vkDestroyFence(m_Device, fence, VULKAN_CPU_ALLOCATOR);
-        vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &xferCmdBuffer);
-
+        delete cmdBuffer;
         delete vertStaging;
         delete idexStaging;
     }
@@ -515,5 +468,5 @@ private:
 
 std::shared_ptr<AppModuleBase> CreateAppMode(const std::vector<std::string>& cmdLine)
 {
-    return std::make_shared<TriangleModule>(1400, 900, "Buffer", cmdLine);
+    return std::make_shared<TriangleModule>(1400, 900, "Command", cmdLine);
 }
