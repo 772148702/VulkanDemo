@@ -80,6 +80,7 @@ public:
 
     void Prepare() override
     {
+        //command buffer must ahead default res
         AppModuleBase::Prepare();
         CreateFences();
         CreateCommandBuffers();

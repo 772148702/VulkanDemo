@@ -36,7 +36,7 @@ namespace vk_demo
         
         delete indexStagging;
 
-    return indexBuffer;
+        return indexBuffer;
     }
 
      DVKIndexBuffer* DVKIndexBuffer::Create(std::shared_ptr<VulkanDevice> vulkanDevice, DVKCommandBuffer* cmdBuffer, std::vector<uint16> indices)

@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine.h"
+#include "../Engine.h"
 #include "DVKCommand.h"
 #include "DVKBuffer.h"
 #include "DVKIndexBuffer.h"
@@ -32,5 +32,33 @@ namespace vk_demo
         Vector3 min;
         Vector3 max;
         Vector3 corners[8];
+
+        DVKBoundingBox()  
+          : min(MAX_flt, MAX_flt, MAX_flt)
+            , max(MIN_flt, MIN_flt, MIN_flt)
+        {
+
+        }
+
+        DVKBoundingBox(const Vector3& inMin,const Vector3& inMax)
+        :min(inMax),max(inMax)
+        {
+
+        }
+
+        void UpdateCorners()
+        {
+            corners[0].Set(min.x, min.y, min.z);
+            corners[1].Set(max.x, min.y, min.z);
+            corners[2].Set(min.x, max.y, min.z);
+            corners[3].Set(max.x, max.y, min.z);
+
+            corners[4].Set(min.x, min.y, max.z);
+            corners[5].Set(max.x, min.y, max.z);
+            corners[6].Set(min.x, max.y, max.z);
+            corners[7].Set(max.x, max.y, max.z);
+        }
+
+
     };
 }
