@@ -201,6 +201,8 @@ private:
             vkCmdBindVertexBuffers(m_CommandBuffers[i], 0, 1, &(m_VertexBuffer->buffer), offsets);
             vkCmdBindIndexBuffer(m_CommandBuffers[i], m_IndexBuffer->buffer, 0, VK_INDEX_TYPE_UINT16);
             vkCmdDrawIndexed(m_CommandBuffers[i], m_IndicesCount, 1, 0, 0, 0);
+            //we bind pso in there, then draw
+            m_GUI->BindDrawCmd(m_CommandBuffers[i], m_RenderPass);
 
             vkCmdEndRenderPass(m_CommandBuffers[i]);
 
