@@ -12,13 +12,20 @@ include_dir_list = {
 
 links_list={"User32","Gdi32","shell32"}
 add_defines("PLATFORM_WINDOWS","NOMINMAX","MONKEY_DEBUG","_WINDOWS")
+
+target("imgui")
+     set_kind("static")
+    add_includedirs(include_dir_list)
+    add_files("./external/imgui/**.cpp")
+target_end()
+
 target("Vulkan")
     set_kind("static")
     add_files("./src/Engine/**.cpp")
     add_includedirs(include_dir_list, "$(projectdir)/src/Engine")
+    add_deps("imgui")
     add_links(links_list,"$(projectdir)/external/vulkan/windows/lib/vulkan-1")
         --copy resource file to build directory
-
 target_end()
 
 target("Shader")

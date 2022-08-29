@@ -7,10 +7,13 @@
 #include "Demo/DVKUtils.h"
 #include "Demo/DVKCamera.h"
 
+#include "Math/Vector3.h"
 #include "Math/Vector4.h"
 #include "Math/Matrix4x4.h"
 
 #include <vector>
+#include "Demo/ImageGUIContext.h"
+#include "imgui.h"
 
 class TriangleModule : public DemoBase
 {
@@ -35,7 +38,8 @@ public:
     {
         DemoBase::Setup();
         DemoBase::Prepare();
-
+        
+        CreateGUI();
         CreateMeshBuffers();
         CreateUniformBuffers();
         CreateDescriptorPool();
@@ -53,6 +57,8 @@ public:
     {
         DemoBase::Release();
 
+
+        DestroyGUI();
         DestroyDescriptorSetLayout();
         DestroyDescriptorPool();
         DestroyPipelines();
@@ -86,12 +92,63 @@ private:
 
     void Draw(float time, float delta)
     {
-        m_ViewCamera.Update(time, delta);
+
+
+        bool hovered = UpdateUI(time, delta);
+        if (!hovered)
+        {
+            m_ViewCamera.Update(time, delta);
+        }
+
         UpdateUniformBuffers(time, delta);
         int32 bufferIndex = DemoBase::AcquireBackbufferIndex();
         DemoBase::Present(bufferIndex);
     }
 
+    bool UpdateUI(float time, float delta)
+    {
+        m_GUI->StartFrame();
+
+        bool yes = true;
+        {
+            static float f = 0.0f;
+            static Vector3 color(0,0,0);
+            static int counter  = 0;
+
+            ImGui::SetNextWindowPos(ImVec2(0,0));
+            ImGui::SetNextWindowSize(ImVec2(0,0),ImGuiSetCond_FirstUseEver);
+            ImGui::Begin("ImGUI!", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+            ImGui::Checkbox("AutoRotate", &m_EnableRotate);
+
+            ImGui::Text("This is some useful text.");
+            ImGui::Checkbox("Demo Window", &yes);
+            ImGui::Checkbox("Another Window", &yes);
+
+            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+            ImGui::ColorEdit3("clear color", (float*)&color);
+
+            if (ImGui::Button("Button"))
+            {
+                counter++;
+            }
+
+            ImGui::SameLine();
+            ImGui::Text("counter = %d", counter);
+
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            ImGui::End();
+        }
+        bool hovered = ImGui::IsAnyWindowHovered() || ImGui::IsAnyItemHovered() || ImGui::IsRootWindowOrAnyChildHovered();
+
+        m_GUI->EndFrame();
+
+        if (m_GUI->Update())
+        {
+            SetupCommandBuffers();
+        }
+
+        return hovered;
+    }
     void SetupCommandBuffers()
     {
         VkCommandBufferBeginInfo cmdBeginInfo;
@@ -446,7 +503,20 @@ private:
         delete m_IndexBuffer;
     }
 
+    void CreateGUI()
+    {
+        m_GUI = new ImageGUIContext();
+        m_GUI->Init("assets/fonts/Ubuntu-Regular.ttf");
+    }
+
+    void DestroyGUI()
+    {
+        m_GUI->Destroy();
+        delete m_GUI;
+    }
+
 private:
+    bool                            m_EnableRotate = false;
     bool                            m_Ready = false;
     vk_demo::DVKCamera              m_ViewCamera;
 
@@ -464,9 +534,11 @@ private:
     VkPipeline                      m_Pipeline = VK_NULL_HANDLE;
 
     uint32                          m_IndicesCount = 0;
+
+    ImageGUIContext*                m_GUI = nullptr;
 };
 
 std::shared_ptr<AppModuleBase> CreateAppMode(const std::vector<std::string>& cmdLine)
 {
-    return std::make_shared<TriangleModule>(1400, 900, "Command", cmdLine);
+    return std::make_shared<TriangleModule>(1400, 900, "GUI", cmdLine);
 }
