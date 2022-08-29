@@ -26,10 +26,10 @@ target("Shader")
     on_load(function(target)
         --os.cd("./src")
         --os.execv("python", {path.join("Example","compile.py")})
-        local temp = vformat(path.join("$(buildir)","$(os)","$(arch)","$(mode)"))
-        local srcResource = vformat(path.join("$(projectdir)","src","Example","assets"));
-        os.rm(path.join(temp,"assets"))
-        os.cp(srcResource,temp)
+        -- local temp = vformat(path.join("$(buildir)","$(os)","$(arch)","$(mode)"))
+        -- local srcResource = vformat(path.join("$(projectdir)","src","Example","assets"));
+        -- os.rm(path.join(temp,"assets"))
+        -- os.cp(srcResource,temp)
        
         --print(vformat("cp Resource from "..srcResource.." to "..temp));
     end)

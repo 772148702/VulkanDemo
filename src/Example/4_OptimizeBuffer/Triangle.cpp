@@ -4,10 +4,11 @@
 #include "Demo/DemoBase.h"
 #include "Demo/DVKBuffer.h"
 #include "Demo/DVKCamera.h"
-#include "Demo/FileManager.h"
-#include "Demo/DVKCommand.h"
+
 #include "Math/Vector4.h"
 #include "Math/Matrix4x4.h"
+
+#include "Demo/FileManager.h"
 
 #include <vector>
 
@@ -70,23 +71,6 @@ public:
 
 private:
 
-    struct GPUBuffer
-    {
-        VkDeviceMemory  memory;
-        VkBuffer        buffer;
-
-        GPUBuffer()
-            : memory(VK_NULL_HANDLE)
-            , buffer(VK_NULL_HANDLE)
-        {
-
-        }
-    };
-
-    typedef GPUBuffer   IndexBuffer;
-    typedef GPUBuffer   VertexBuffer;
-    typedef GPUBuffer   UBOBuffer;
-
     struct Vertex
     {
         float position[3];
@@ -120,12 +104,10 @@ private:
 
     void Draw(float time, float delta)
     {
-         m_MVPData.model.AppendRotation(90.0f * delta, Vector3::UpVector);
-
-        m_MVPData.view = m_ViewCamera.GetView();
-        m_MVPData.projection = m_ViewCamera.GetProjection();
-
-        m_MVPBuffer->CopyFrom(&m_MVPData, sizeof(UBOData));
+        m_ViewCamera.Update(time, delta);
+        UpdateUniformBuffers(time, delta);
+        int32 bufferIndex = DemoBase::AcquireBackbufferIndex();
+        DemoBase::Present(bufferIndex);
     }
 
     void SetupCommandBuffers()
@@ -177,7 +159,7 @@ private:
 
             vkCmdBindDescriptorSets(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &m_DescriptorSet, 0, nullptr);
             vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline);
-            vkCmdBindVertexBuffers(m_CommandBuffers[i], 0, 1, &m_VertexBuffer->buffer, offsets);
+            vkCmdBindVertexBuffers(m_CommandBuffers[i], 0, 1, &(m_VertexBuffer->buffer), offsets);
             vkCmdBindIndexBuffer(m_CommandBuffers[i], m_IndexBuffer->buffer, 0, VK_INDEX_TYPE_UINT16);
             vkCmdDrawIndexed(m_CommandBuffers[i], m_IndicesCount, 1, 0, 0, 0);
 
@@ -381,13 +363,11 @@ private:
     void UpdateUniformBuffers(float time, float delta)
     {
         m_MVPData.model.AppendRotation(90.0f * delta, Vector3::UpVector);
+
         m_MVPData.view = m_ViewCamera.GetView();
         m_MVPData.projection = m_ViewCamera.GetProjection();
 
-        uint8_t *pData = nullptr;
-        VERIFYVULKANRESULT(vkMapMemory(m_Device, m_MVPBuffer->memory, 0, sizeof(UBOData), 0, (void**)&pData));
-        std::memcpy(pData, &m_MVPData, sizeof(UBOData));
-        vkUnmapMemory(m_Device, m_MVPBuffer->memory);
+        m_MVPBuffer->CopyFrom(&m_MVPData, sizeof(UBOData));
     }
 
     void CreateUniformBuffers()
@@ -414,7 +394,6 @@ private:
 
     void CreateMeshBuffers()
     {
-        // 顶点数据
         std::vector<Vertex> vertices = {
             {
                 {  1.0f,  1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }
@@ -427,64 +406,90 @@ private:
             }
         };
 
-        // 索引数据
         std::vector<uint16> indices = { 0, 1, 2 };
         m_IndicesCount = (uint32)indices.size();
 
         // staging buffer
-		vk_demo::DVKBuffer* vertStaging = vk_demo::DVKBuffer::CreateBuffer(
-			m_VulkanDevice, 
-			VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 
-			vertices.size() * sizeof(Vertex), 
-			vertices.data()
-		);
+        vk_demo::DVKBuffer* vertStaging = vk_demo::DVKBuffer::CreateBuffer(
+            m_VulkanDevice,
+            VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            vertices.size() * sizeof(Vertex),
+            vertices.data()
+        );
 
         vk_demo::DVKBuffer* idexStaging = vk_demo::DVKBuffer::CreateBuffer(
-			m_VulkanDevice, 
-			VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 
-			indices.size() * sizeof(uint16), 
-			indices.data()
-		);
-
+            m_VulkanDevice,
+            VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            indices.size() * sizeof(uint16),
+            indices.data()
+        );
 
         // reeal buffer
-		m_VertexBuffer = vk_demo::DVKBuffer::CreateBuffer(
-			m_VulkanDevice, 
-			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, 
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 
-			vertices.size() * sizeof(Vertex)
-		);
+        m_VertexBuffer = vk_demo::DVKBuffer::CreateBuffer(
+            m_VulkanDevice,
+            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+            vertices.size() * sizeof(Vertex)
+        );
 
-		m_IndexBuffer = vk_demo::DVKBuffer::CreateBuffer(
-			m_VulkanDevice, 
-			VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, 
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 
-			indices.size() * sizeof(uint16)
-		);
+        m_IndexBuffer = vk_demo::DVKBuffer::CreateBuffer(
+            m_VulkanDevice,
+            VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+            indices.size() * sizeof(uint16)
+        );
 
-		vk_demo::DVKCommandBuffer* cmdBuffer = vk_demo::DVKCommandBuffer::Create(m_VulkanDevice, m_CommandPool);
-		cmdBuffer->Begin();
+        VkCommandBuffer xferCmdBuffer;
+        // gfx queue自带transfer功能，为了优化需要使用专有的xfer queue。这里为了简单，先将就用。
+        VkCommandBufferAllocateInfo xferCmdBufferInfo;
+        ZeroVulkanStruct(xferCmdBufferInfo, VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO);
+        xferCmdBufferInfo.commandPool        = m_CommandPool;
+        xferCmdBufferInfo.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        xferCmdBufferInfo.commandBufferCount = 1;
+        VERIFYVULKANRESULT(vkAllocateCommandBuffers(m_Device, &xferCmdBufferInfo, &xferCmdBuffer));
 
-		VkBufferCopy copyRegion = {};
-		copyRegion.size = vertices.size() * sizeof(Vertex);
-		vkCmdCopyBuffer(cmdBuffer->cmdBuffer, vertStaging->buffer, m_VertexBuffer->buffer, 1, &copyRegion);
+        // 开始录制命令
+        VkCommandBufferBeginInfo cmdBufferBeginInfo;
+        ZeroVulkanStruct(cmdBufferBeginInfo, VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO);
+        VERIFYVULKANRESULT(vkBeginCommandBuffer(xferCmdBuffer, &cmdBufferBeginInfo));
 
-		copyRegion.size = indices.size() * sizeof(uint16);
-		vkCmdCopyBuffer(cmdBuffer->cmdBuffer, idexStaging->buffer, m_IndexBuffer->buffer, 1, &copyRegion);
-        
-		cmdBuffer->End();
-		cmdBuffer->Submit();
-        
-		delete cmdBuffer;
-		delete vertStaging;
-		delete idexStaging;
+        VkBufferCopy copyRegion = {};
+        copyRegion.size = vertices.size() * sizeof(Vertex);
+        vkCmdCopyBuffer(xferCmdBuffer, vertStaging->buffer, m_VertexBuffer->buffer, 1, &copyRegion);
+
+        copyRegion.size = indices.size() * sizeof(uint16);
+        vkCmdCopyBuffer(xferCmdBuffer, idexStaging->buffer, m_IndexBuffer->buffer, 1, &copyRegion);
+
+        // 结束录制
+        VERIFYVULKANRESULT(vkEndCommandBuffer(xferCmdBuffer));
+
+        // 提交命令，并且等待命令执行完毕。
+        VkSubmitInfo submitInfo;
+        ZeroVulkanStruct(submitInfo, VK_STRUCTURE_TYPE_SUBMIT_INFO);
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers    = &xferCmdBuffer;
+
+        VkFenceCreateInfo fenceInfo;
+        ZeroVulkanStruct(fenceInfo, VK_STRUCTURE_TYPE_FENCE_CREATE_INFO);
+        fenceInfo.flags = 0;
+
+        VkFence fence = VK_NULL_HANDLE;
+        VERIFYVULKANRESULT(vkCreateFence(m_Device, &fenceInfo, VULKAN_CPU_ALLOCATOR, &fence));
+        VERIFYVULKANRESULT(vkQueueSubmit(m_GfxQueue, 1, &submitInfo, fence));
+        VERIFYVULKANRESULT(vkWaitForFences(m_Device, 1, &fence, VK_TRUE, MAX_int64));
+
+        vkDestroyFence(m_Device, fence, VULKAN_CPU_ALLOCATOR);
+        vkFreeCommandBuffers(m_Device, m_CommandPool, 1, &xferCmdBuffer);
+
+        delete vertStaging;
+        delete idexStaging;
     }
 
     void DestroyMeshBuffers()
     {
-       delete m_VertexBuffer;
+        delete m_VertexBuffer;
         delete m_IndexBuffer;
     }
 
@@ -494,11 +499,9 @@ private:
 
     UBOData                         m_MVPData;
 
-    vk_demo::DVKBuffer*                      m_VertexBuffer;
-    vk_demo::DVKBuffer*                       m_IndexBuffer;
-    vk_demo::DVKBuffer*                         m_MVPBuffer;
-
-    VkDescriptorBufferInfo          m_MVPDescriptor;
+    vk_demo::DVKBuffer*             m_IndexBuffer = nullptr;
+    vk_demo::DVKBuffer*             m_VertexBuffer = nullptr;
+    vk_demo::DVKBuffer*             m_MVPBuffer = nullptr;
 
     VkDescriptorSetLayout           m_DescriptorSetLayout = VK_NULL_HANDLE;
     VkDescriptorSet                 m_DescriptorSet = VK_NULL_HANDLE;
@@ -512,5 +515,5 @@ private:
 
 std::shared_ptr<AppModuleBase> CreateAppMode(const std::vector<std::string>& cmdLine)
 {
-    return std::make_shared<TriangleModule>(1400, 900, "DemoBase", cmdLine);
+    return std::make_shared<TriangleModule>(1400, 900, "Buffer", cmdLine);
 }
