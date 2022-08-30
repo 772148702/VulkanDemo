@@ -15,16 +15,16 @@
 #include "Demo/ImageGUIContext.h"
 #include "imgui.h"
 
-class UniformBufferModule : public DemoBase
+class TriangleModule : public DemoBase
 {
 public:
-    UniformBufferModule(int32 width, int32 height, const char* title, const std::vector<std::string>& cmdLine)
+    TriangleModule(int32 width, int32 height, const char* title, const std::vector<std::string>& cmdLine)
         : DemoBase(width, height, title, cmdLine)
     {
 
     }
 
-    virtual ~UniformBufferModule()
+    virtual ~TriangleModule()
     {
 
     }
@@ -83,20 +83,11 @@ private:
         float color[3];
     };
 
-    struct UBOMVPData
+    struct UBOData
     {
         Matrix4x4 model;
         Matrix4x4 view;
         Matrix4x4 projection;
-    };
-
-
-    struct UBOParams
-    {
-        float omega;
-        float k;
-        float cutoff;
-        float padding;
     };
 
     void Draw(float time, float delta)
@@ -126,11 +117,25 @@ private:
 
             ImGui::SetNextWindowPos(ImVec2(0,0));
             ImGui::SetNextWindowSize(ImVec2(0,0),ImGuiSetCond_FirstUseEver);
-            ImGui::Begin("UniformBuffer", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-            
-            ImGui::SliderFloat("omega##01",  &(m_Params.omega),  0.0f, 5.0f);
-            ImGui::SliderFloat("k##02",      &(m_Params.k),      0.0f, 20.0f);
-            ImGui::SliderFloat("cutoff##03", &(m_Params.cutoff), 0.0f, 5.0f);
+            ImGui::Begin("ImGUI!", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+            ImGui::Checkbox("AutoRotate", &m_EnableRotate);
+
+            ImGui::Text("This is some useful text.");
+            ImGui::Checkbox("Demo Window", &yes);
+            ImGui::Checkbox("Another Window", &yes);
+
+            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+            ImGui::ColorEdit3("clear color", (float*)&color);
+
+            if (ImGui::Button("Button"))
+            {
+                counter++;
+            }
+
+            ImGui::SameLine();
+            ImGui::Text("counter = %d", counter);
+
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::End();
         }
         bool hovered = ImGui::IsAnyWindowHovered() || ImGui::IsAnyItemHovered() || ImGui::IsRootWindowOrAnyChildHovered();
@@ -207,29 +212,21 @@ private:
 
     void CreateDescriptorSet()
     {
-       VkDescriptorSetAllocateInfo allocInfo;
+        VkDescriptorSetAllocateInfo allocInfo;
         ZeroVulkanStruct(allocInfo, VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO);
         allocInfo.descriptorPool     = m_DescriptorPool;
         allocInfo.descriptorSetCount = 1;
         allocInfo.pSetLayouts        = &m_DescriptorSetLayout;
         VERIFYVULKANRESULT(vkAllocateDescriptorSets(m_Device, &allocInfo, &m_DescriptorSet));
 
-        std::vector<VkWriteDescriptorSet> writeDescriptorSets(2);
-        ZeroVulkanStruct(writeDescriptorSets[0], VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
-        writeDescriptorSets[0].dstSet          = m_DescriptorSet;
-        writeDescriptorSets[0].descriptorCount = 1;
-        writeDescriptorSets[0].descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        writeDescriptorSets[0].pBufferInfo     = &(m_MVPBuffer->descriptor);
-        writeDescriptorSets[0].dstBinding      = 0;
-
-        ZeroVulkanStruct(writeDescriptorSets[1], VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
-        writeDescriptorSets[1].dstSet          = m_DescriptorSet;
-        writeDescriptorSets[1].descriptorCount = 1;
-        writeDescriptorSets[1].descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        writeDescriptorSets[1].pBufferInfo     = &(m_ParamsBuffer->descriptor);
-        writeDescriptorSets[1].dstBinding      = 1;
-
-        vkUpdateDescriptorSets(m_Device, 2, writeDescriptorSets.data(), 0, nullptr);
+        VkWriteDescriptorSet writeDescriptorSet;
+        ZeroVulkanStruct(writeDescriptorSet, VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
+        writeDescriptorSet.dstSet          = m_DescriptorSet;
+        writeDescriptorSet.descriptorCount = 1;
+        writeDescriptorSet.descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        writeDescriptorSet.pBufferInfo     = &(m_MVPBuffer->descriptor);
+        writeDescriptorSet.dstBinding      = 0;
+        vkUpdateDescriptorSets(m_Device, 1, &writeDescriptorSet, 0, nullptr);
     }
 
     void CreateDescriptorPool()
@@ -345,10 +342,10 @@ private:
         ZeroVulkanStruct(shaderStages[0], VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);
         ZeroVulkanStruct(shaderStages[1], VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO);
         shaderStages[0].stage  = VK_SHADER_STAGE_VERTEX_BIT;
-        shaderStages[0].module = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/7_UniformBuffer/diffuse.vert.spv");
+        shaderStages[0].module = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/2_Triangle/triangle.vert.spv");
         shaderStages[0].pName  = "main";
         shaderStages[1].stage  = VK_SHADER_STAGE_FRAGMENT_BIT;
-        shaderStages[1].module = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/7_UniformBuffer/diffuse.frag.spv");
+        shaderStages[1].module = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/2_Triangle/triangle.frag.spv");
         shaderStages[1].pName  = "main";
 
         VkGraphicsPipelineCreateInfo pipelineCreateInfo;
@@ -378,23 +375,17 @@ private:
 
     void CreateDescriptorSetLayout()
     {
-        std::vector<VkDescriptorSetLayoutBinding> layoutBindings(2);
-        layoutBindings[0].binding            = 0;
-        layoutBindings[0].descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        layoutBindings[0].descriptorCount    = 1;
-        layoutBindings[0].stageFlags         = VK_SHADER_STAGE_VERTEX_BIT;
-        layoutBindings[0].pImmutableSamplers = nullptr;
-
-        layoutBindings[1].binding            = 1;
-        layoutBindings[1].descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        layoutBindings[1].descriptorCount    = 1;
-        layoutBindings[1].stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT;
-        layoutBindings[1].pImmutableSamplers = nullptr;
+        VkDescriptorSetLayoutBinding layoutBinding;
+        layoutBinding.binding            = 0;
+        layoutBinding.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        layoutBinding.descriptorCount    = 1;
+        layoutBinding.stageFlags         = VK_SHADER_STAGE_VERTEX_BIT;
+        layoutBinding.pImmutableSamplers = nullptr;
 
         VkDescriptorSetLayoutCreateInfo descSetLayoutInfo;
         ZeroVulkanStruct(descSetLayoutInfo, VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO);
-        descSetLayoutInfo.bindingCount = 2;
-        descSetLayoutInfo.pBindings    = layoutBindings.data();
+        descSetLayoutInfo.bindingCount = 1;
+        descSetLayoutInfo.pBindings    = &layoutBinding;
         VERIFYVULKANRESULT(vkCreateDescriptorSetLayout(m_Device, &descSetLayoutInfo, VULKAN_CPU_ALLOCATOR, &m_DescriptorSetLayout));
 
         VkPipelineLayoutCreateInfo pipeLayoutInfo;
@@ -416,13 +407,12 @@ private:
         m_MVPData.view = m_ViewCamera.GetView();
         m_MVPData.projection = m_ViewCamera.GetProjection();
 
-        m_MVPBuffer->CopyFrom(&m_MVPData, sizeof(UBOMVPData));
-        m_ParamsBuffer->CopyFrom(&m_Params, sizeof(UBOParams));
+        m_MVPBuffer->CopyFrom(&m_MVPData, sizeof(UBOData));
     }
 
     void CreateUniformBuffers()
     {
-      m_ViewCamera.Perspective(PI / 4, GetWidth(), GetHeight(), 0.1f, 1000.0f);
+        m_ViewCamera.Perspective(PI / 4, GetWidth(), GetHeight(), 0.1f, 1000.0f);
         m_ViewCamera.SetPosition(0, 0, -5.0f);
         m_ViewCamera.LookAt(0, 0, 0);
 
@@ -430,52 +420,33 @@ private:
             m_VulkanDevice,
             VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            sizeof(UBOMVPData),
+            sizeof(UBOData),
             &m_MVPData
         );
         m_MVPBuffer->Map();
-
-        m_Params.omega   = 0.25 * PI;
-        m_Params.k       = 10;
-        m_Params.cutoff  = 0.57;
-        m_Params.padding = 0.0f;
-        m_ParamsBuffer = vk_demo::DVKBuffer::CreateBuffer(
-            m_VulkanDevice,
-            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            sizeof(UBOParams),
-            &m_Params
-        );
-        m_ParamsBuffer->Map();
     }
 
     void DestroyUniformBuffers()
     {
         m_MVPBuffer->UnMap();
         delete m_MVPBuffer;
-
-        m_ParamsBuffer->UnMap();
-        delete m_ParamsBuffer;
     }
 
     void CreateMeshBuffers()
     {
-             std::vector<Vertex> vertices = {
+        std::vector<Vertex> vertices = {
             {
-                {  1.0f,  1.0f, 0.0f }, { 1.0f, 0.0f }
+                {  1.0f,  1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }
             },
             {
-                { -1.0f,  1.0f, 0.0f }, { 0.0f, 0.0f }
+                { -1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }
             },
             {
-                { -1.0f, -1.0f, 0.0f }, { 0.0f, 1.0f }
-            },
-            {
-                {  1.0f, -1.0f, 0.0f }, { 1.0f, 1.0f }
-            },
+                {  0.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }
+            }
         };
 
-        std::vector<uint16> indices = { 0, 1, 2, 0, 2, 3 };
+        std::vector<uint16> indices = { 0, 1, 2 };
         m_IndicesCount = (uint32)indices.size();
 
         // staging buffer
@@ -551,13 +522,11 @@ private:
     bool                            m_Ready = false;
     vk_demo::DVKCamera              m_ViewCamera;
 
-    UBOMVPData                       m_MVPData;
-    UBOParams                       m_Params;
+    UBOData                         m_MVPData;
 
     vk_demo::DVKBuffer*             m_IndexBuffer = nullptr;
     vk_demo::DVKBuffer*             m_VertexBuffer = nullptr;
     vk_demo::DVKBuffer*             m_MVPBuffer = nullptr;
-    vk_demo::DVKBuffer*             m_ParamsBuffer = nullptr;
 
     VkDescriptorSetLayout           m_DescriptorSetLayout = VK_NULL_HANDLE;
     VkDescriptorSet                 m_DescriptorSet = VK_NULL_HANDLE;
@@ -573,5 +542,5 @@ private:
 
 std::shared_ptr<AppModuleBase> CreateAppMode(const std::vector<std::string>& cmdLine)
 {
-    return std::make_shared<UniformBufferModule>(1400, 900, "ShaderParam", cmdLine);
+    return std::make_shared<TriangleModule>(1400, 900, "VertexIndexBuffer", cmdLine);
 }

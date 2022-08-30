@@ -3,3 +3,4 @@
 /.xmake
 /.cache
 **.spv
+compile_commands.json
