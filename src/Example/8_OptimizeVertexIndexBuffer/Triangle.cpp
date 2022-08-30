@@ -1,6 +1,8 @@
 #include "Common/Common.h"
 #include "Common/Log.h"
 
+#include "Demo/DVKIndexBuffer.h"
+#include "Demo/DVKVertexBuffer.h"
 #include "Demo/DemoBase.h"
 #include "Demo/DVKBuffer.h"
 #include "Demo/DVKCommand.h"
@@ -13,6 +15,8 @@
 
 #include <vector>
 #include "Demo/ImageGUIContext.h"
+#include "Vulkan/RHIDefinitions.h"
+#include "Vulkan/VulkanDevice.h"
 #include "imgui.h"
 
 class TriangleModule : public DemoBase
@@ -107,37 +111,21 @@ private:
 
     bool UpdateUI(float time, float delta)
     {
-        m_GUI->StartFrame();
+            m_GUI->StartFrame();
 
-        bool yes = true;
         {
-            static float f = 0.0f;
-            static Vector3 color(0,0,0);
-            static int counter  = 0;
+            ImGui::SetNextWindowPos(ImVec2(0, 0));
+            ImGui::SetNextWindowSize(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);
+            ImGui::Begin("VertexBuffer", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
-            ImGui::SetNextWindowPos(ImVec2(0,0));
-            ImGui::SetNextWindowSize(ImVec2(0,0),ImGuiSetCond_FirstUseEver);
-            ImGui::Begin("ImGUI!", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-            ImGui::Checkbox("AutoRotate", &m_EnableRotate);
+            ImGui::Checkbox("AutoRotate", &m_AutoRotate);
 
-            ImGui::Text("This is some useful text.");
-            ImGui::Checkbox("Demo Window", &yes);
-            ImGui::Checkbox("Another Window", &yes);
-
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-            ImGui::ColorEdit3("clear color", (float*)&color);
-
-            if (ImGui::Button("Button"))
-            {
-                counter++;
-            }
-
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-
+            ImGui::Text("VertexBuffer And IndexBuffer.");
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
             ImGui::End();
         }
+
         bool hovered = ImGui::IsAnyWindowHovered() || ImGui::IsAnyItemHovered() || ImGui::IsRootWindowOrAnyChildHovered();
 
         m_GUI->EndFrame();
@@ -198,8 +186,10 @@ private:
 
             vkCmdBindDescriptorSets(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_PipelineLayout, 0, 1, &m_DescriptorSet, 0, nullptr);
             vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline);
-            vkCmdBindVertexBuffers(m_CommandBuffers[i], 0, 1, &(m_VertexBuffer->buffer), offsets);
-            vkCmdBindIndexBuffer(m_CommandBuffers[i], m_IndexBuffer->buffer, 0, VK_INDEX_TYPE_UINT16);
+          
+            m_VertexBuffer->Bind(m_CommandBuffers[i]);
+            m_IndexBuffer->Bind(m_CommandBuffers[i]);
+          
             vkCmdDrawIndexed(m_CommandBuffers[i], m_IndicesCount, 1, 0, 0, 0);
             //we bind pso in there, then draw
             m_GUI->BindDrawCmd(m_CommandBuffers[i], m_RenderPass);
@@ -403,7 +393,10 @@ private:
 
     void UpdateUniformBuffers(float time, float delta)
     {
-        m_MVPData.model.AppendRotation(90.0f * delta, Vector3::UpVector);
+        if (m_AutoRotate)
+        {
+             m_MVPData.model.AppendRotation(90.0f * delta, Vector3::UpVector);
+        }
         m_MVPData.view = m_ViewCamera.GetView();
         m_MVPData.projection = m_ViewCamera.GetProjection();
 
@@ -434,69 +427,21 @@ private:
 
     void CreateMeshBuffers()
     {
-        std::vector<Vertex> vertices = {
-            {
-                {  1.0f,  1.0f, 0.0f }, { 1.0f, 0.0f, 0.0f }
-            },
-            {
-                { -1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }
-            },
-            {
-                {  0.0f, -1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }
-            }
+         std::vector<float> vertices = {
+            1.0f,   1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f,  -1.0f, 0.0f, 0.0f, 0.0f, 1.0f
         };
 
         std::vector<uint16> indices = { 0, 1, 2 };
         m_IndicesCount = (uint32)indices.size();
 
-        // staging buffer
-        vk_demo::DVKBuffer* vertStaging = vk_demo::DVKBuffer::CreateBuffer(
-            m_VulkanDevice,
-            VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            vertices.size() * sizeof(Vertex),
-            vertices.data()
-        );
-
-        vk_demo::DVKBuffer* idexStaging = vk_demo::DVKBuffer::CreateBuffer(
-            m_VulkanDevice,
-            VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            indices.size() * sizeof(uint16),
-            indices.data()
-        );
-
-        // reeal buffer
-        m_VertexBuffer = vk_demo::DVKBuffer::CreateBuffer(
-            m_VulkanDevice,
-            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-            vertices.size() * sizeof(Vertex)
-        );
-
-        m_IndexBuffer = vk_demo::DVKBuffer::CreateBuffer(
-            m_VulkanDevice,
-            VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-            indices.size() * sizeof(uint16)
-        );
-
-        vk_demo::DVKCommandBuffer* cmdBuffer = vk_demo::DVKCommandBuffer::Create(m_VulkanDevice, m_CommandPool);
-        cmdBuffer->Begin();
-
-        VkBufferCopy copyRegion = {};
-        copyRegion.size = vertices.size() * sizeof(Vertex);
-        vkCmdCopyBuffer(cmdBuffer->cmdBuffer, vertStaging->buffer, m_VertexBuffer->buffer, 1, &copyRegion);
-
-        copyRegion.size = indices.size() * sizeof(uint16);
-        vkCmdCopyBuffer(cmdBuffer->cmdBuffer, idexStaging->buffer, m_IndexBuffer->buffer, 1, &copyRegion);
-
-        cmdBuffer->End();
-        cmdBuffer->Submit();
+       vk_demo::DVKCommandBuffer* cmdBuffer = vk_demo::DVKCommandBuffer::Create(m_VulkanDevice,m_CommandPool);
+    
+        m_VertexBuffer = vk_demo::DVKVertexBuffer::Create(m_VulkanDevice,cmdBuffer,vertices,{VertexAttribute::VA_Position,VertexAttribute::VA_Color});
+        m_IndexBuffer = vk_demo::DVKIndexBuffer::Create(m_VulkanDevice,cmdBuffer,indices);
 
         delete cmdBuffer;
-        delete vertStaging;
-        delete idexStaging;
     }
 
     void DestroyMeshBuffers()
@@ -518,14 +463,14 @@ private:
     }
 
 private:
-    bool                            m_EnableRotate = false;
+    bool                            m_AutoRotate = false;
     bool                            m_Ready = false;
     vk_demo::DVKCamera              m_ViewCamera;
 
     UBOData                         m_MVPData;
 
-    vk_demo::DVKBuffer*             m_IndexBuffer = nullptr;
-    vk_demo::DVKBuffer*             m_VertexBuffer = nullptr;
+    vk_demo::DVKIndexBuffer*             m_IndexBuffer = nullptr;
+    vk_demo::DVKVertexBuffer*             m_VertexBuffer = nullptr;
     vk_demo::DVKBuffer*             m_MVPBuffer = nullptr;
 
     VkDescriptorSetLayout           m_DescriptorSetLayout = VK_NULL_HANDLE;
