@@ -8,6 +8,7 @@
 #include "Demo/DVKCommand.h"
 #include "Demo/DVKUtils.h"
 #include "Demo/DVKCamera.h"
+#include "Demo/DVKModel.h"
 
 #include "Math/Vector3.h"
 #include "Math/Vector4.h"
