@@ -6,6 +6,7 @@
 #include "Math/Math.h"
 #include "Math/Vector4.h"
 
+#include "Vulkan/RHIDefinitions.h"
 #include "Vulkan/VulkanCommon.h"
 #include "Vulkan/VulkanGlobals.h"
 #include "vulkan/vulkan_core.h"
@@ -204,6 +205,109 @@ namespace vk_demo
         VkImage             depthStencilRenderTargetImage = VK_NULL_HANDLE;
 
         VkExtent2D          extent2D;
+    };
+
+
+    class DVKRenderTarget
+    {
+        private:
+        DVKRenderTarget(const DVKRenderPassInfo& inRenderPassInfo)
+            : rtLayout(inRenderPassInfo)
+            , renderPassInfo(inRenderPassInfo)
+            , clearColor(0, 0, 0, 1)
+        {
+            for (int32 i = 0; i < inRenderPassInfo.numColorRenderTargets; ++i)
+            {
+                VkClearValue clearValue = {};
+                clearValue.color        = {
+                    { clearColor.x, clearColor.y, clearColor.z, clearColor.w }
+                };
+                clearValues.push_back(clearValue);
+            }
+
+            if (inRenderPassInfo.depthStencilRenderTarget.depthStencilTarget)
+            {
+                VkClearValue clearValue = {};
+                clearValue.depthStencil = { 1.0f, 0 };
+                clearValues.push_back(clearValue);
+            }
+
+            colorLayout = ImageLayoutBarrier::PixelShaderRead;
+            depthLayout = ImageLayoutBarrier::PixelShaderRead;
+        }
+
+
+        DVKRenderTarget(const DVKRenderPassInfo& inRenderPassInfo, Vector4 inClearColor)
+            : rtLayout(inRenderPassInfo)
+            , renderPassInfo(inRenderPassInfo)
+            , clearColor(inClearColor)
+        {
+            for(int32 i=0;i<inRenderPassInfo.numColorRenderTargets;i++)
+            {
+                VkClearValue clearValue ={};
+                clearValue.color = {clearColor.x,clearColor.y,clearColor.z,clearColor.w};
+                clearValues.push_back(clearValue);
+            }
+
+            if(inRenderPassInfo.depthStencilRenderTarget.depthStencilTarget)
+            {
+                VkClearValue clearValue = {};
+                clearValue.depthStencil={1.0f,0};
+                clearValues.push_back(clearValue);
+            }   
+
+            colorLayout = ImageLayoutBarrier::PixelShaderRead;
+            depthLayout = ImageLayoutBarrier::PixelShaderRead;
+        }
+      public:
+        ~DVKRenderTarget()
+        {
+            if (renderPass)
+            {
+                delete renderPass;
+                renderPass = nullptr;
+            }
+
+            if (frameBuffer)
+            {
+                delete frameBuffer;
+                frameBuffer = nullptr;
+            }
+        }
+
+        void BeginRenderPass(VkCommandBuffer cmdBuffer);
+
+        void EndRenderPass(VkCommandBuffer cmdBuffer);
+
+        
+        FORCE_INLINE VkRenderPass GetRenderPass() const
+        {
+            return renderPass->renderPass;
+        }
+
+        FORCE_INLINE VkFramebuffer GetFrameBuffer() const
+        {
+            return frameBuffer->frameBuffer;
+        }
+
+        static DVKRenderTarget* Create(std::shared_ptr<VulkanDevice> vulkanDevice, const DVKRenderPassInfo& inRenderPassInfo);
+
+        static DVKRenderTarget* Create(std::shared_ptr<VulkanDevice> vulkanDevice, const DVKRenderPassInfo& inRenderPassInfo, Vector4 clearColor);
+
+        public:
+           DVKRenderTargetLayout rtLayout;
+           DVKRenderPassInfo renderPassInfo;
+           Vector4           clearColor;
+           DVKRenderPass*    renderPass=nullptr;
+           DVKFrameBuffer*   frameBuffer = nullptr;
+
+           VkDevice          device = VK_NULL_HANDLE;
+           VkExtent2D        extent2D;
+
+           std::vector<VkClearValue> clearValues;
+
+           ImageLayoutBarrier   colorLayout;
+           ImageLayoutBarrier   depthLayout;
     };
 
 }
