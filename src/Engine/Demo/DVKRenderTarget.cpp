@@ -152,10 +152,23 @@ namespace vk_demo
     {
         numColorAttachments   = rtLayout.numColorAttachments;
         numColorRenderTargets = renderPassInfo.numColorRenderTargets;   
-        for (int32 index = 0; index < renderPassInfo.numColorRenderTargets; ++index)\
+        for (int32 index = 0; index < renderPassInfo.numColorRenderTargets; ++index)
         {
+            DVKTexture* texture = renderPassInfo.colorRenderTargets[index].renderTarget;
 
+            colorRenderTargetImages[index] = texture->image;
+
+            attachmentTextureViews.push_back(texture->imageView);
         }
+
+        if(rtLayout.hasDepthStencil)
+        {
+            DVKTexture* texture = renderPassInfo.depthStencilRenderTarget.depthStencilTarget;
+            depthStencilRenderTargetImage = texture->image;
+            attachmentTextureViews.push_back(texture->imageView);
+        }
+
+        
 
     }
 }
