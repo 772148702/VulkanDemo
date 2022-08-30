@@ -173,6 +173,7 @@ namespace vk_demo
     
     struct DVKVertexSkin
     {
+        //受到多少根骨头影响
         int32  used = 0;
         int32  indices[4];
         float  weights[4];
