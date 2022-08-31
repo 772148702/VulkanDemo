@@ -3,11 +3,13 @@
 #include "Demo/DVKIndexBuffer.h"
 #include "Demo/DVKVertexBuffer.h"
 #include "FileManager.h"
+#include "Math/Math.h"
 #include "Math/Matrix4x4.h"
 
 #include "Math/Vector3.h"
 #include "Vulkan/RHIDefinitions.h"
 #include "assimp/Importer.hpp"
+#include "assimp/anim.h"
 #include "assimp/material.h"
 #include "assimp/mesh.h"
 #include "assimp/scene.h"
@@ -15,8 +17,10 @@
 #include "assimp/cimport.h"
 #include "assimp/texture.h"
 #include "assimp/types.h"
+#include "vulkan/vulkan_core.h"
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 
 namespace vk_demo
@@ -452,5 +456,353 @@ namespace vk_demo
          }
      }
     
+
+     void DVKModel::LoadPrimitives(std::vector<float>& vertices, std::vector<uint32>& indices, DVKMesh* mesh, const aiMesh* aiMesh, const aiScene* aiScene)
+     {
+        int32 stride = (int32) vertices.size()/aiMesh->mNumVertices;
+        if(indices.size()>65535)
+        {
+            std::unordered_map<uint32, uint32> indicesMap;
+            DVKPrimitive* primitive = nullptr;
+
+            for(int32 i=0;i<indices.size();++i)
+            {
+                uint32 idx = indices[i];
+                if(primitive==nullptr)
+                {
+                    primitive = new DVKPrimitive();
+                    indices.clear();
+                    mesh->primitives.push_back(primitive);
+                }
+
+                uint32 newIdx =0;
+                auto it = indicesMap.find(idx);
+                if(it==indicesMap.end())
+                {
+                    uint32 start = idx*stride;
+                    newIdx = (uint32)primitive->vertices.size()/stride;
+                    primitive->vertices.insert(primitive->vertices.end(),vertices.begin()+start,vertices.begin()+start+stride);
+                    indicesMap.insert(std::make_pair(idx,newIdx));
+                }
+                else 
+                {
+                    newIdx = it->second;
+                }
+
+                primitive->indices.push_back(newIdx);
+
+                if(primitive->indices.size()==65535)
+                {
+                    primitive==nullptr;
+                }
+            }
+
+            if(cmdBuffer)
+            {
+                for(int32 i=0;i<mesh->primitives.size();++i)
+                {
+                    primitive = mesh->primitives[i];
+                    primitive->vertexBuffer = DVKVertexBuffer::Create(device,cmdBuffer,primitive->vertices,attributes);
+                    primitive->indexBuffer = DVKIndexBuffer::Create(device,cmdBuffer,primitive->indices);
+                }
+            }
+        } 
+        else 
+        {
+            DVKPrimitive* primitive = new DVKPrimitive();
+            primitive->vertices = vertices;
+            for (uint16 i = 0; i < indices.size(); ++i)
+            {
+                primitive->indices.push_back(indices[i]);
+            }
+            mesh->primitives.push_back(primitive);
+
+            if (cmdBuffer)
+            {
+                primitive->vertexBuffer = DVKVertexBuffer::Create(device, cmdBuffer, primitive->vertices, attributes);
+                primitive->indexBuffer  = DVKIndexBuffer::Create(device, cmdBuffer, primitive->indices);
+            }
+        }
+
+        for (int32 i = 0; i < mesh->primitives.size(); ++i)
+        {
+            DVKPrimitive* primitive = mesh->primitives[i];
+            primitive->vertexCount  = (int32)primitive->vertices.size() / stride;
+            primitive->triangleNum  = (int32)primitive->indices.size() / 3;
+
+            mesh->vertexCount   += primitive->vertexCount;
+            mesh->triangleCount += primitive->triangleNum;
+        }
+     }
+
+
+     DVKMesh* DVKModel::LoadMesh(const aiMesh* aiMesh, const aiScene* aiScene)
+     {
+        DVKMesh* mesh = new DVKMesh();
+
+        //load material
+        aiMaterial* material = aiScene->mMaterials[aiMesh->mMaterialIndex];
+        if(material)
+        {
+            FillMaterialTextures(material,mesh->material);
+        }
+
+        //load bones
+        std::unordered_map<uint32,DVKVertexSkin> skinInfoMap;
+        if(aiMesh->mNumBones>0&&loadSkin)
+        {
+            LoadSkin(skinInfoMap,mesh,aiMesh,aiScene);
+        }
+
+          // load vertex data
+        std::vector<float> vertices;
+        Vector3 mmin( MAX_FLT,  MAX_FLT,  MAX_FLT);
+        Vector3 mmax(-MAX_FLT, -MAX_FLT, -MAX_FLT);
+        LoadVertexDatas(skinInfoMap, vertices, mmax, mmin, mesh, aiMesh, aiScene);
+
+        // load indices
+        std::vector<uint32> indices;
+        LoadIndices(indices, aiMesh, aiScene);
+
+        // load primitives
+        LoadPrimitives(vertices, indices, mesh, aiMesh, aiScene);
+
+        mesh->bounding.min = mmin;
+        mesh->bounding.max = mmax;
+        mesh->bounding.UpdateCorners();
+
+        return mesh;
+     }
+
+    DVKNode* DVKModel::LoadNode(const aiNode* aiNode, const aiScene* aiScene)
+    {
+        DVKNode* vkNode = new DVKNode();
+        vkNode->name = aiNode->mName.C_Str();
+
+        if(rootNode==nullptr)
+        {
+            rootNode = vkNode;
+        }
+
+        //local matrix 
+        FillMatrixWithAiMatrix(vkNode->localMatrix,aiNode->mTransformation);
+
+        //mesh
+        if(aiNode->mNumMeshes>0)
+        {
+            for(uint32 i=0;i<aiNode->mNumMeshes;++i)
+            {
+                DVKMesh* vkMesh = LoadMesh(aiScene->mMeshes[i],aiScene);
+                vkMesh->linkNode = vkNode;
+                vkNode->meshes.push_back(vkMesh);
+                meshes.push_back(vkMesh);
+            }
+        }
+
+        nodesMap.insert(std::make_pair(vkNode->name,vkNode));
+        linearNodes.push_back(vkNode);
+
+        //bones parent
+        int32 boneParentIndex = -1;
+        {
+            auto it = bonesMap.find(vkNode->name);
+            if(it!=bonesMap.end())
+            {
+                boneParentIndex = it->second->index;
+            }
+        }
+
+        //children node
+        for(int32 i=0;i<(int32)aiNode->mNumChildren;++i)
+        {
+            DVKNode* childNode = LoadNode(aiNode->mChildren[i],aiScene);
+            childNode->parent = vkNode;
+            vkNode->children.push_back(childNode);
+
+            {
+                auto it = bonesMap.find(childNode->name);
+                if(it!=bonesMap.end())
+                {
+                    it->second->parent=boneParentIndex;
+                }
+            }
+        }
+        return vkNode;
+    }
+
+    void DVKModel::LoadAnim(const aiScene * aiScene)
+    {
+        for(int32 i=0;i<(int32)aiScene->mNumAnimations;++i)
+        {
+            aiAnimation* aianimation = aiScene->mAnimations[i];
+            float timeTick = aianimation->mTicksPerSecond!=0?(float)aianimation->mTicksPerSecond:25.0f;
+
+            animations.push_back(DVKAnimation());
+            DVKAnimation& dvkAnimation = animations.back();
+
+            for(int32 j=0;j<(int32)aianimation->mNumChannels;++j)
+            {
+                aiNodeAnim* nodeAnim = aianimation->mChannels[j];
+                std::string nodeName = nodeAnim->mNodeName.C_Str();
+
+                dvkAnimation.clips.insert(std::make_pair(nodeName,DVKAnimationClip()));
+                DVKAnimationClip& animClip = dvkAnimation.clips[nodeName];
+                animClip.nodeName = nodeName;
+                animClip.duration = 0.0f;
+                //position
+                for(int32 index=0;index<(int32)nodeAnim->mNumPositionKeys;++index)
+                {   
+                    aiVectorKey& aiKey = nodeAnim->mPositionKeys[index];
+                    animClip.position.keys.push_back((float)aiKey.mTime/timeTick);
+                    animClip.position.values.push_back(Vector3(aiKey.mValue.x,aiKey.mValue.y,aiKey.mValue.z));
+                    animClip.duration = MMath::Max((float)aiKey.mTime / timeTick, animClip.duration);
+                }
+                //scale
+                for(int32 index=0;index<(int32)nodeAnim->mNumScalingKeys;++index)
+                {
+                    aiVectorKey& aikey = nodeAnim->mScalingKeys[index];
+                    animClip.scales.keys.push_back((float)aikey.mTime/timeTick);
+                    animClip.scales.values.push_back((Vector3(aikey.mValue.x,aikey.mValue.y,aikey.mValue.z)));
+                    animClip.duration = MMath::Max((float)aikey.mTime/timeTick,animClip.duration);
+                }
+                //rotation
+                for(int32 index=0;index<(int32)nodeAnim->mNumRotationKeys;++index)
+                {
+                    aiQuatKey& aikey = nodeAnim->mRotationKeys[index];
+                    animClip.ratations.keys.push_back((float)aikey.mTime/timeTick);
+                    animClip.ratations.values.push_back(Quat(aikey.mValue.x,aikey.mValue.y,aikey.mValue.z,aikey.mValue.w));
+                    animClip.duration = MMath::Max((float)aikey.mTime/timeTick,animClip.duration);
+                }
+                dvkAnimation.duration = MMath::Max(animClip.duration, dvkAnimation.duration);
+            }
+        }
+    }
+
+
+    void DVKModel::GotoAnimation(float time)
+    {
+        if(animIndex==-1)
+        {
+            return ;
+        }
+
+        DVKAnimation& animation = animations[animIndex];
+        animation.time = MMath::Clamp(time,0.0f,animation.duration);
+
+        for(auto it = animation.clips.begin();it!=animation.clips.end();++it)
+        {
+            vk_demo::DVKAnimationClip& clip = it->second;
+            vk_demo::DVKNode* node = nodesMap[clip.nodeName];
+
+            float alpha = 0.0f;
+            //rotation
+            Quat prevRot(0,0,0,1);
+            Quat nextRot(0,0,0,1);
+            clip.ratations.GetValue(animation.time,prevRot,nextRot,alpha);
+            Quat retRot = MMath::Lerp(prevRot,nextRot,alpha);
+
+            //position
+            Vector3 prevPos(0, 0, 0);
+            Vector3 nextPos(0, 0, 0);
+            clip.position.GetValue(animation.time,prevPos,nextPos,alpha);
+            Vector3 retPos = MMath::Lerp(prevPos,nextPos,alpha);
+
+            // scale
+            Vector3 prevScale(1, 1, 1);
+            Vector3 nextScale(1, 1, 1);
+            clip.scales.GetValue(animation.time, prevScale, nextScale, alpha);
+            Vector3 retScale = MMath::Lerp(prevScale, nextScale, alpha);
+
+
+            node->localMatrix.SetIdentity();
+            node->localMatrix.AppendScale(retScale);
+            node->localMatrix.Append(retRot.ToMatrix());
+            node->localMatrix.AppendTranslation(retPos);
+        }
+
+        for(int32 i=0;i<bones.size();++i)
+        {
+            DVKBone* bone = bones[i];
+            DVKNode* node = nodesMap[bone->name];
+            bone->finalTransform = bone->inverseBindPose;
+            bone->finalTransform.Append(node->GetGlobalMatrix());
+        }
+
+    }
+
+    void DVKModel::Update(float time, float delta)
+    {
+        if (animIndex == -1)
+        {
+            return;
+        }
+        DVKAnimation& animation = animations[animIndex];
+        animation.time+=delta*animation.speed;
+        if(animation.time>=animation.duration)
+        {
+            animation.time = animation.time-animation.duration;
+        }
+        GotoAnimation(animation.time);
+    }
+
+
+   void DVKModel::SetAnimation(int32 index)
+    {
+        if (index >= animations.size())
+        {
+            return;
+        }
+        if (index < 0)
+        {
+            return;
+        }
+        animIndex = index;
+    }
+
+    DVKAnimation& DVKModel::GetAnimation(int32 index)
+    {
+        if (index == -1)
+        {
+            index = animIndex;
+        }
+        return animations[index];
+    }
+
+
+    VkVertexInputBindingDescription DVKModel::GetInputBinding()
+    {
+        int32 stride = 0;
+        for(int32 i=0;i<attributes.size();++i)
+        {
+            stride+=VertexAttributeToSize(attributes[i]);
+        }
+        VkVertexInputBindingDescription vertexInputBinding = {};
+        vertexInputBinding.binding = 0;
+        vertexInputBinding.stride = stride;
+        vertexInputBinding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+        return vertexInputBinding;
+    }
+
+    std::vector<VkVertexInputAttributeDescription> DVKModel::GetInputAttributes()
+    {
+        std::vector<VkVertexInputAttributeDescription> vertexInputAttributs;
+        int32 offset = 0;
+        for(int32 i=0;i<attributes.size();++i)
+        {
+            VkVertexInputAttributeDescription inputAttribute ={};
+            inputAttribute.binding = 0;
+            inputAttribute.location = i;
+            inputAttribute.format = VertexAttributeToVkFormat(attributes[i]);
+            inputAttribute.offset   = offset;
+            offset += VertexAttributeToSize(attributes[i]);
+            vertexInputAttributs.push_back(inputAttribute);
+        }
+         return vertexInputAttributs;
+    }
+
+
+
+
 
 }

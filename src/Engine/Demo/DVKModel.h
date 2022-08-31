@@ -255,7 +255,7 @@ namespace vk_demo
       
       std::vector<int32> bones;
       bool isSkin = false;
-
+      DVKMaterialInfo     material;
       int32 vertexCount;
       int32 triangleCount;
 
