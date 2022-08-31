@@ -67,7 +67,6 @@ public:
         DestroyAssets();
         DestroyGUI();
         DestroyDescriptorSetLayout();
-        DestroyDescriptorPool();
         DestroyPipelines();
         DestroyUniformBuffers();
 
@@ -93,13 +92,21 @@ private:
 
     struct ParamBlock
     {
-        float intensity;
+       Vector3 lightDir;
+        float curvature;
+
+        Vector3 lightColor;
+        float exposure;
+
+        Vector2 curvatureScaleBias;
+        float blurredLevel;
+        float padding;
     };
 
     void Draw(float time, float delta)
     {
 
-
+        int32 bufferIndex = DemoBase::AcquireBackbufferIndex();
         bool hovered = UpdateUI(time, delta);
         if (!hovered)
         {
@@ -107,26 +114,34 @@ private:
         }
 
         UpdateUniformBuffers(time, delta);
-        int32 bufferIndex = DemoBase::AcquireBackbufferIndex();
+      
         DemoBase::Present(bufferIndex);
     }
 
     bool UpdateUI(float time, float delta)
     {
-        m_GUI->StartFrame();
+           m_GUI->StartFrame();
+
         {
             ImGui::SetNextWindowPos(ImVec2(0, 0));
             ImGui::SetNextWindowSize(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);
-            ImGui::Begin("LoadMesh", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-            ImGui::Text("Load mesh from file.");
-
-            ImGui::Checkbox("AutoRotate", &m_AutoRotate);
+            ImGui::Begin("Texture", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+            ImGui::Text("SSS Demo");
 
             for (int32 i = 0; i < m_Model->meshes.size(); ++i)
             {
                 vk_demo::DVKMesh* mesh = m_Model->meshes[i];
                 ImGui::Text("%-20s Tri:%d", mesh->linkNode->name.c_str(), mesh->triangleCount);
             }
+
+            ImGui::SliderFloat("Curvature", &(m_ParamData.curvature),       0.0f, 10.0f);
+            ImGui::SliderFloat2("CurvatureBias", (float*)&(m_ParamData.curvatureScaleBias), 0.0f, 1.0f);
+
+            ImGui::SliderFloat("BlurredLevel", &(m_ParamData.blurredLevel), 0.0f, 12.0f);
+            ImGui::SliderFloat("Exposure", &(m_ParamData.exposure),         0.0f, 10.0f);
+
+            ImGui::SliderFloat3("LightDirection", (float*)&(m_ParamData.lightDir), -10.0f, 10.0f);
+            ImGui::ColorEdit3("LightColor", (float*)&(m_ParamData.lightColor));
 
             ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::End();
@@ -271,44 +286,26 @@ private:
         VERIFYVULKANRESULT(vkCreateDescriptorPool(m_Device, &descriptorPoolInfo, VULKAN_CPU_ALLOCATOR, &m_DescriptorPool));
     }
 
-    void DestroyDescriptorPool()
-    {
-        vkDestroyDescriptorPool(m_Device, m_DescriptorPool, VULKAN_CPU_ALLOCATOR);
-    }
+
 
     void CreatePipelines()
     {
-        m_Pipelines.resize(3);
+        m_Pipelines.resize(1);
         VkVertexInputBindingDescription vertexInputBinding = m_Model->GetInputBinding();
         std::vector<VkVertexInputAttributeDescription> vertexInputAttributs = m_Model->GetInputAttributes();
 
-        vk_demo::DVKGfxPipelineInfo pipelineInfo0;
-        pipelineInfo0.vertShaderModule = vk_demo::LoadSPIPVShader(m_Device,"assets/shaders/10_Pipelines/pipeline0.vert.spv");
-        pipelineInfo0.fragShaderModule = vk_demo::LoadSPIPVShader(m_Device,"assets/shaders/10_Pipelines/pipeline0.frag.spv");
-        m_Pipelines[0] = vk_demo::DVKGfxPipeline::Create(m_VulkanDevice, m_PipelineCache, pipelineInfo0, { vertexInputBinding }, vertexInputAttributs, m_PipelineLayout, m_RenderPass);
-        
-        vk_demo::DVKGfxPipelineInfo pipelineInfo1;
-        pipelineInfo1.vertShaderModule = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/10_Pipelines/pipeline1.vert.spv");
-        pipelineInfo1.fragShaderModule = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/10_Pipelines/pipeline1.frag.spv");
-        m_Pipelines[1] = vk_demo::DVKGfxPipeline::Create(m_VulkanDevice, m_PipelineCache, pipelineInfo1, { vertexInputBinding }, vertexInputAttributs, m_PipelineLayout, m_RenderPass);
+        vk_demo::DVKGfxPipelineInfo pipelineInfo;
+        pipelineInfo.vertShaderModule = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/11_Texture/texture.vert.spv");
+        pipelineInfo.fragShaderModule = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/11_Texture/texture.frag.spv");
+        m_Pipelines[0] = vk_demo::DVKGfxPipeline::Create(m_VulkanDevice, m_PipelineCache, pipelineInfo, { vertexInputBinding }, vertexInputAttributs, m_PipelineLayout, m_RenderPass);
 
-        vk_demo::DVKGfxPipelineInfo pipelineInfo2;
-        pipelineInfo2.rasterizationState.polygonMode = VkPolygonMode::VK_POLYGON_MODE_LINE;
-        pipelineInfo2.vertShaderModule = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/10_Pipelines/pipeline2.vert.spv");
-        pipelineInfo2.fragShaderModule = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/10_Pipelines/pipeline2.frag.spv");
-        m_Pipelines[2] = vk_demo::DVKGfxPipeline::Create(m_VulkanDevice, m_PipelineCache, pipelineInfo2, { vertexInputBinding }, vertexInputAttributs, m_PipelineLayout, m_RenderPass);
-
-        vkDestroyShaderModule(m_Device, pipelineInfo0.vertShaderModule, VULKAN_CPU_ALLOCATOR);
-        vkDestroyShaderModule(m_Device, pipelineInfo0.fragShaderModule, VULKAN_CPU_ALLOCATOR);
-        vkDestroyShaderModule(m_Device, pipelineInfo1.vertShaderModule, VULKAN_CPU_ALLOCATOR);
-        vkDestroyShaderModule(m_Device, pipelineInfo1.fragShaderModule, VULKAN_CPU_ALLOCATOR);
-        vkDestroyShaderModule(m_Device, pipelineInfo2.vertShaderModule, VULKAN_CPU_ALLOCATOR);
-        vkDestroyShaderModule(m_Device, pipelineInfo2.fragShaderModule, VULKAN_CPU_ALLOCATOR);
+        vkDestroyShaderModule(m_Device, pipelineInfo.vertShaderModule, VULKAN_CPU_ALLOCATOR);
+        vkDestroyShaderModule(m_Device, pipelineInfo.fragShaderModule, VULKAN_CPU_ALLOCATOR);
     }
 
     void DestroyPipelines()
     {
-             for (int32 i = 0; i < m_Pipelines.size(); ++i)
+        for (int32 i = 0; i < m_Pipelines.size(); ++i)
         {
             delete m_Pipelines[i];
         }
@@ -317,7 +314,7 @@ private:
 
     void CreateDescriptorSetLayout()
     {
-        VkDescriptorSetLayoutBinding layoutBindings[2] = { };
+        VkDescriptorSetLayoutBinding layoutBindings[6] = { };
         layoutBindings[0].binding            = 0;
         layoutBindings[0].descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         layoutBindings[0].descriptorCount    = 1;
@@ -327,12 +324,12 @@ private:
         layoutBindings[1].binding            = 1;
         layoutBindings[1].descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         layoutBindings[1].descriptorCount    = 1;
-        layoutBindings[1].stageFlags         = VK_SHADER_STAGE_VERTEX_BIT;
+        layoutBindings[1].stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT;
         layoutBindings[1].pImmutableSamplers = nullptr;
 
-        for(int32 i=0;i<4;i++)
+        for (int32 i = 0; i < 4; ++i)
         {
-            layoutBindings[2+i].binding = 2+i;
+            layoutBindings[2 + i].binding            = 2 + i;
             layoutBindings[2 + i].descriptorType     = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
             layoutBindings[2 + i].descriptorCount    = 1;
             layoutBindings[2 + i].stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -394,7 +391,17 @@ private:
         );
         m_MVPBuffer->Map();
 
-        m_ParamData.intensity = 0.125f;
+        
+        m_ParamData.blurredLevel = 2.0;
+        m_ParamData.curvature = 3.5;
+        m_ParamData.curvatureScaleBias.x = 0.101;
+        m_ParamData.curvatureScaleBias.y = -0.001;
+        m_ParamData.exposure = 1.0;
+        m_ParamData.lightColor.Set(240.0f / 255.0f, 200.0f / 255.0f, 166.0f / 255.0f);
+        m_ParamData.lightDir.Set(1, 0, -1.0);
+        m_ParamData.lightDir.Normalize();
+        m_ParamData.padding = 0.0;
+
         m_ParamBuffer = vk_demo::DVKBuffer::CreateBuffer(
             m_VulkanDevice,
             VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
@@ -431,11 +438,14 @@ private:
     void LoadAssets()
     {
         vk_demo::DVKCommandBuffer* cmdBuffer = vk_demo::DVKCommandBuffer::Create(m_VulkanDevice,m_CommandPool);
-        m_Model = vk_demo::DVKModel::LoadFromFile(   
-            "assets/models/suzanne.obj",
+        
+        m_Model = vk_demo::DVKModel::LoadFromFile(
+            "assets/models/head.obj",
             m_VulkanDevice,
             cmdBuffer,
-            { VertexAttribute::VA_Position, VertexAttribute::VA_Normal });
+            { VertexAttribute::VA_Position, VertexAttribute::VA_UV0, VertexAttribute::VA_Normal, VertexAttribute::VA_Tangent }
+        );
+
 
 
         m_TexDiffuse       = vk_demo::DVKTexture::Create2D("assets/textures/head_diffuse.jpg", m_VulkanDevice, cmdBuffer);
