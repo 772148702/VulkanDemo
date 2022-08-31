@@ -9,7 +9,7 @@
 #include "Demo/DVKUtils.h"
 #include "Demo/DVKCamera.h"
 #include "Demo/DVKModel.h"
-
+#include "Demo/DVKPipeline.h"
 #include "Math/Vector3.h"
 #include "Math/Vector4.h"
 #include "Math/Matrix4x4.h"
@@ -21,16 +21,16 @@
 #include "imgui.h"
 #include "vulkan/vulkan_core.h"
 
-class TriangleModule : public DemoBase
+class PipelinesModule : public DemoBase
 {
 public:
-    TriangleModule(int32 width, int32 height, const char* title, const std::vector<std::string>& cmdLine)
+    PipelinesModule(int32 width, int32 height, const char* title, const std::vector<std::string>& cmdLine)
         : DemoBase(width, height, title, cmdLine)
     {
 
     }
 
-    virtual ~TriangleModule()
+    virtual ~PipelinesModule()
     {
 
     }
@@ -84,17 +84,16 @@ public:
 
 private:
 
-    struct Vertex
-    {
-        float position[3];
-        float color[3];
-    };
-
-    struct UBOData
+   struct MVPBlock
     {
         Matrix4x4 model;
         Matrix4x4 view;
         Matrix4x4 projection;
+    };
+
+    struct ParamBlock
+    {
+        float intensity;
     };
 
     void Draw(float time, float delta)
@@ -211,29 +210,40 @@ private:
 
     void CreateDescriptorSet()
     {
-        m_DescriptorSets.resize(m_Model->meshes.size());
-        for(int32 i=0;i<m_DescriptorSets.size();++i)
-        {
-            VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
+        VkDescriptorPoolSize poolSize = {};
+        poolSize.type            = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        poolSize.descriptorCount = 2;
 
-            VkDescriptorSetAllocateInfo allocInfo;
-            ZeroVulkanStruct(allocInfo, VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO);
-            allocInfo.descriptorPool     = m_DescriptorPool;
-            allocInfo.descriptorSetCount = 1;
-            allocInfo.pSetLayouts        = &m_DescriptorSetLayout;
-            VERIFYVULKANRESULT(vkAllocateDescriptorSets(m_Device, &allocInfo, &descriptorSet));
+        VkDescriptorPoolCreateInfo descriptorPoolInfo;
+        ZeroVulkanStruct(descriptorPoolInfo, VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO);
+        descriptorPoolInfo.poolSizeCount = 1;
+        descriptorPoolInfo.pPoolSizes    = &poolSize;
+        descriptorPoolInfo.maxSets       = m_Model->meshes.size();
+        VERIFYVULKANRESULT(vkCreateDescriptorPool(m_Device, &descriptorPoolInfo, VULKAN_CPU_ALLOCATOR, &m_DescriptorPool));
 
-            VkWriteDescriptorSet writeDescriptorSet;
-            ZeroVulkanStruct(writeDescriptorSet, VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
-            writeDescriptorSet.dstSet          = descriptorSet;
-            writeDescriptorSet.descriptorCount = 1;
-            writeDescriptorSet.descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            writeDescriptorSet.pBufferInfo     = &(m_MVPBuffers[i]->descriptor);
-            writeDescriptorSet.dstBinding      = 0;
-            vkUpdateDescriptorSets(m_Device, 1, &writeDescriptorSet, 0, nullptr);
+        VkDescriptorSetAllocateInfo allocInfo;
+        ZeroVulkanStruct(allocInfo, VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO);
+        allocInfo.descriptorPool     = m_DescriptorPool;
+        allocInfo.descriptorSetCount = 1;
+        allocInfo.pSetLayouts        = &m_DescriptorSetLayout;
+        VERIFYVULKANRESULT(vkAllocateDescriptorSets(m_Device, &allocInfo, &m_DescriptorSet));
 
-            m_DescriptorSets[i] = descriptorSet;
-        }    
+        VkWriteDescriptorSet writeDescriptorSet;
+        ZeroVulkanStruct(writeDescriptorSet, VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
+        writeDescriptorSet.dstSet          = m_DescriptorSet;
+        writeDescriptorSet.descriptorCount = 1;
+        writeDescriptorSet.descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        writeDescriptorSet.pBufferInfo     = &(m_MVPBuffer->descriptor);
+        writeDescriptorSet.dstBinding      = 0;
+        vkUpdateDescriptorSets(m_Device, 1, &writeDescriptorSet, 0, nullptr);
+
+        ZeroVulkanStruct(writeDescriptorSet, VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
+        writeDescriptorSet.dstSet          = m_DescriptorSet;
+        writeDescriptorSet.descriptorCount = 1;
+        writeDescriptorSet.descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        writeDescriptorSet.pBufferInfo     = &(m_ParamBuffer->descriptor);
+        writeDescriptorSet.dstBinding      = 1;
+        vkUpdateDescriptorSets(m_Device, 1, &writeDescriptorSet, 0, nullptr);  
     }
 
     void CreateDescriptorPool()
@@ -475,28 +485,32 @@ private:
 
 private:
 
-    typedef std::vector<vk_demo::DVKBuffer*>    DVKBuffers;
-    typedef std::vector<VkDescriptorSet>        VkDescriptorSets;
+    typedef std::vector<vk_demo::DVKGfxPipeline*>   DVKPipelines;
 
     bool                            m_AutoRotate = false;
     bool                            m_Ready = false;
 
-    std::vector<UBOData>            m_MVPDatas;
-    DVKBuffers                      m_MVPBuffers;
-
     vk_demo::DVKCamera              m_ViewCamera;
+
+    MVPBlock                        m_MVPData;
+    vk_demo::DVKBuffer*             m_MVPBuffer;
+
+    ParamBlock                      m_ParamData;
+    vk_demo::DVKBuffer*             m_ParamBuffer = nullptr;
+
+    DVKPipelines                    m_Pipelines;
+
     vk_demo::DVKModel*              m_Model = nullptr;
 
-    VkPipeline                      m_Pipeline = VK_NULL_HANDLE;
     VkDescriptorSetLayout           m_DescriptorSetLayout = VK_NULL_HANDLE;
     VkPipelineLayout                m_PipelineLayout = VK_NULL_HANDLE;
     VkDescriptorPool                m_DescriptorPool = VK_NULL_HANDLE;
-    VkDescriptorSets                m_DescriptorSets;
+    VkDescriptorSet                 m_DescriptorSet = VK_NULL_HANDLE;
 
     ImageGUIContext*                m_GUI = nullptr;
 };
 
 std::shared_ptr<AppModuleBase> CreateAppMode(const std::vector<std::string>& cmdLine)
 {
-    return std::make_shared<TriangleModule>(1400, 900, "LoadMesh", cmdLine);
+    return std::make_shared<PipelinesModule>(1400, 900, "Pipelines", cmdLine);
 }
