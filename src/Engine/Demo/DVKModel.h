@@ -231,9 +231,9 @@ namespace vk_demo
     {
       std::string nodeName;
       float duration;
-      DVKAnimChannel<Vector3> position;
+      DVKAnimChannel<Vector3> positions;
       DVKAnimChannel<Vector3> scales;
-      DVKAnimChannel<Quat>    ratations;
+      DVKAnimChannel<Quat>    rotations;
     };
 
     struct DVKAnimation

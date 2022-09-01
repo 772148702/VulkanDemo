@@ -219,20 +219,16 @@ private:
             vkCmdSetViewport(m_CommandBuffers[i], 0, 1, &viewport);
             vkCmdSetScissor(m_CommandBuffers[i], 0, 1, &scissor);
 
-            vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipelines[0]->pipeline);
-            vkCmdBindDescriptorSets(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipelines[0]->pipelineLayout, 0, 1, &m_DescriptorSet, 0, nullptr);
+            vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline->pipeline);
+            
 
             for (int32 meshIndex = 0; meshIndex < m_Model->meshes.size(); ++meshIndex)
             {
-                const Matrix4x4& globalMatrix = m_Model->meshes[meshIndex]->linkNode->GetGlobalMatrix();
-                vkCmdPushConstants(
-                m_CommandBuffers[i],
-                m_PipelineLayout,
-                VK_SHADER_STAGE_VERTEX_BIT,
-                0,
-                sizeof(ModelPushConstantBlock),
-                &globalMatrix
-                );
+                uint32 dynamicOffsets[2] = {
+                    meshIndex * modelAlign,
+                    meshIndex * colorAlign
+                };
+                vkCmdBindDescriptorSets(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline->pipelineLayout, 0, 1, &m_DescriptorSet, 0, dynamicOffsets);
                 m_Model->meshes[meshIndex]->BindDrawCmd(m_CommandBuffers[i]);
             }
 
@@ -245,17 +241,20 @@ private:
 
     void CreateDescriptorSet()
     {
-        VkDescriptorPoolSize poolSizes[1];
+        VkDescriptorPoolSize poolSizes[2];
         poolSizes[0].type            = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         poolSizes[0].descriptorCount = 1;
+        poolSizes[1].type            = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        poolSizes[1].descriptorCount = 2;
 
 
         VkDescriptorPoolCreateInfo descriptorPoolInfo;
         ZeroVulkanStruct(descriptorPoolInfo, VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO);
-        descriptorPoolInfo.poolSizeCount = 1;
+        descriptorPoolInfo.poolSizeCount = 2;
         descriptorPoolInfo.pPoolSizes    = poolSizes;
         descriptorPoolInfo.maxSets       = 1;
         VERIFYVULKANRESULT(vkCreateDescriptorPool(m_Device, &descriptorPoolInfo, VULKAN_CPU_ALLOCATOR, &m_DescriptorPool));
+
 
         VkDescriptorSetAllocateInfo allocInfo;
         ZeroVulkanStruct(allocInfo, VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO);
@@ -274,6 +273,29 @@ private:
         writeDescriptorSet.dstBinding      = 0;
         vkUpdateDescriptorSets(m_Device, 1, &writeDescriptorSet, 0, nullptr);
 
+        VkDescriptorBufferInfo bufferInfo;
+        bufferInfo.buffer = m_ModelBuffer->buffer;
+        bufferInfo.offset = 0;
+        bufferInfo.range  = sizeof(ModelBlock);
+
+        ZeroVulkanStruct(writeDescriptorSet, VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
+        writeDescriptorSet.dstSet          = m_DescriptorSet;
+        writeDescriptorSet.descriptorCount = 1;
+        writeDescriptorSet.descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        writeDescriptorSet.pBufferInfo     = &bufferInfo;
+        writeDescriptorSet.dstBinding      = 1;
+        vkUpdateDescriptorSets(m_Device, 1, &writeDescriptorSet, 0, nullptr);
+
+        bufferInfo.buffer = m_ColorBuffer->buffer;
+        bufferInfo.offset = 0;
+        bufferInfo.range  = sizeof(ColorBlock);
+        ZeroVulkanStruct(writeDescriptorSet, VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
+        writeDescriptorSet.dstSet          = m_DescriptorSet;
+        writeDescriptorSet.descriptorCount = 1;
+        writeDescriptorSet.descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        writeDescriptorSet.pBufferInfo     = &bufferInfo;
+        writeDescriptorSet.dstBinding      = 2;
+        vkUpdateDescriptorSets(m_Device, 1, &writeDescriptorSet, 0, nullptr);
     
     }
 
@@ -295,14 +317,23 @@ private:
 
     void CreatePipelines()
     {
-        m_Pipelines.resize(1);
+     
         VkVertexInputBindingDescription vertexInputBinding = m_Model->GetInputBinding();
         std::vector<VkVertexInputAttributeDescription> vertexInputAttributs = m_Model->GetInputAttributes();
 
         vk_demo::DVKGfxPipelineInfo pipelineInfo;
-        pipelineInfo.vertShaderModule = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/12_PushConstants/obj.vert.spv");
-        pipelineInfo.fragShaderModule = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/12_PushConstants/obj.frag.spv");
-        m_Pipelines[0] = vk_demo::DVKGfxPipeline::Create(m_VulkanDevice, m_PipelineCache, pipelineInfo, { vertexInputBinding }, vertexInputAttributs, m_PipelineLayout, m_RenderPass);
+        pipelineInfo.vertShaderModule = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/13_DynamicUniformBuffer/obj.vert.spv");
+        pipelineInfo.fragShaderModule = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/13_DynamicUniformBuffer/obj.frag.spv");
+        
+        pipelineInfo.blendAttachmentStates[0].blendEnable         = VK_TRUE;
+        pipelineInfo.blendAttachmentStates[0].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+        pipelineInfo.blendAttachmentStates[0].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        pipelineInfo.blendAttachmentStates[0].colorBlendOp        = VK_BLEND_OP_ADD;
+        pipelineInfo.blendAttachmentStates[0].srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+        pipelineInfo.blendAttachmentStates[0].dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        pipelineInfo.blendAttachmentStates[0].alphaBlendOp        = VK_BLEND_OP_ADD;
+       
+        m_Pipeline = vk_demo::DVKGfxPipeline::Create(m_VulkanDevice, m_PipelineCache, pipelineInfo, { vertexInputBinding }, vertexInputAttributs, m_PipelineLayout, m_RenderPass);
 
         vkDestroyShaderModule(m_Device, pipelineInfo.vertShaderModule, VULKAN_CPU_ALLOCATOR);
         vkDestroyShaderModule(m_Device, pipelineInfo.fragShaderModule, VULKAN_CPU_ALLOCATOR);
@@ -310,16 +341,13 @@ private:
 
     void DestroyPipelines()
     {
-        for (int32 i = 0; i < m_Pipelines.size(); ++i)
-        {
-            delete m_Pipelines[i];
-        }
-        m_Pipelines.clear();
+        delete m_Pipeline;
+        m_Pipeline = nullptr;
     }
 
     void CreateDescriptorSetLayout()
     {
-        VkDescriptorSetLayoutBinding layoutBindings[1] = { };
+        VkDescriptorSetLayoutBinding layoutBindings[3] = { };
         layoutBindings[0].binding            = 0;
         layoutBindings[0].descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         layoutBindings[0].descriptorCount    = 1;
@@ -327,24 +355,31 @@ private:
         layoutBindings[0].pImmutableSamplers = nullptr;
 
 
+        layoutBindings[1].binding            = 1;
+        layoutBindings[1].descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        layoutBindings[1].descriptorCount    = 1;
+        layoutBindings[1].stageFlags         = VK_SHADER_STAGE_VERTEX_BIT;
+        layoutBindings[1].pImmutableSamplers = nullptr;
+
+
+
+        layoutBindings[2].binding            = 2;
+        layoutBindings[2].descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+        layoutBindings[2].descriptorCount    = 1;
+        layoutBindings[2].stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT;
+        layoutBindings[2].pImmutableSamplers = nullptr;
+
+
         VkDescriptorSetLayoutCreateInfo descSetLayoutInfo;
         ZeroVulkanStruct(descSetLayoutInfo, VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO);
-        descSetLayoutInfo.bindingCount = 1;
+        descSetLayoutInfo.bindingCount = 3;
         descSetLayoutInfo.pBindings    = layoutBindings;
         VERIFYVULKANRESULT(vkCreateDescriptorSetLayout(m_Device, &descSetLayoutInfo, VULKAN_CPU_ALLOCATOR, &m_DescriptorSetLayout));
-
-
-        VkPushConstantRange pushConstantRange = {};
-        pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-        pushConstantRange.offset     = 0;
-        pushConstantRange.size       = sizeof(ModelPushConstantBlock);
 
         VkPipelineLayoutCreateInfo pipeLayoutInfo;
         ZeroVulkanStruct(pipeLayoutInfo, VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO);
         pipeLayoutInfo.setLayoutCount = 1;
         pipeLayoutInfo.pSetLayouts    = &m_DescriptorSetLayout;
-        pipeLayoutInfo.pushConstantRangeCount = 1;
-        pipeLayoutInfo.pPushConstantRanges    = &pushConstantRange;
         VERIFYVULKANRESULT(vkCreatePipelineLayout(m_Device, &pipeLayoutInfo, VULKAN_CPU_ALLOCATOR, &m_PipelineLayout));
     }
 
@@ -357,16 +392,25 @@ private:
 
     void UpdateUniformBuffers(float time, float delta)
     {
+        uint32 alignment  = m_VulkanDevice->GetLimits().minUniformBufferOffsetAlignment;
+        uint32 modelAlign = Align(sizeof(ModelBlock), alignment);
+
         if (m_AutoRotate)
         {
-            m_Model->rootNode->localMatrix.AppendRotation(30.0f * delta, Vector3::UpVector);
-           // m_MVPData.model.AppendRotation(90.0f * delta, Vector3::UpVector);
+            for (int32 i = 0; i < m_Model->meshes.size(); ++i)
+            {
+                ModelBlock* modelBlock = (ModelBlock*)(m_ModelDatas.data() + modelAlign * i);
+                modelBlock->model.AppendRotation(45.0f * delta, Vector3::UpVector);
+            }
+            m_ModelBuffer->CopyFrom(m_ModelDatas.data(), m_ModelBuffer->size);
         }
 
         m_ViewProjData.view = m_ViewCamera.GetView();
         m_ViewProjData.projection = m_ViewCamera.GetProjection();
 
         m_ViewProjBuffer->CopyFrom(&m_ViewProjData, sizeof(ViewProjectionBlock));
+
+        m_ColorBuffer->CopyFrom(m_ColorDatas.data(), m_ColorBuffer->size);
         // m_ParamBuffer->CopyFrom(&m_ParamData, sizeof(ParamBlock));
         //why we need to do here
         SetupCommandBuffers();
@@ -382,43 +426,73 @@ private:
         m_ViewCamera.SetPosition(boundCenter.x, boundCenter.y + 1000, boundCenter.z - boundSize.Size() * 1.5f);
         m_ViewCamera.LookAt(boundCenter);
 
+        uint32 alignment  = m_VulkanDevice->GetLimits().minUniformBufferOffsetAlignment;
+        // world matrix dynamicbuffer
+        uint32 modelAlign = Align(sizeof(ModelBlock), alignment);
+        m_ModelDatas.resize(modelAlign * m_Model->meshes.size());
+        for (int32 i = 0; i < m_Model->meshes.size(); ++i)
+        {
+            ModelBlock* modelBlock = (ModelBlock*)(m_ModelDatas.data() + modelAlign * i);
+            modelBlock->model = m_Model->meshes[i]->linkNode->GetGlobalMatrix();
+        }
+
+        m_ModelBuffer = vk_demo::DVKBuffer::CreateBuffer(
+            m_VulkanDevice,
+            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            m_ModelDatas.size(),
+            m_ModelDatas.data()
+        );
+        m_ModelBuffer->Map();
+
         m_ViewProjBuffer = vk_demo::DVKBuffer::CreateBuffer(
             m_VulkanDevice,
             VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            sizeof(m_ViewProjData),
+            sizeof(ViewProjectionBlock),
             &(m_ViewProjData)
         );
         m_ViewProjBuffer->Map();
 
-        
-        // m_ParamData.blurredLevel = 2.0;
-        // m_ParamData.curvature = 3.5;
-        // m_ParamData.curvatureScaleBias.x = 0.101;
-        // m_ParamData.curvatureScaleBias.y = -0.001;
-        // m_ParamData.exposure = 1.0;
-        // m_ParamData.lightColor.Set(240.0f / 255.0f, 200.0f / 255.0f, 166.0f / 255.0f);
-        // m_ParamData.lightDir.Set(1, 0, -1.0);
-        // m_ParamData.lightDir.Normalize();
-        // m_ParamData.padding = 0.0;
+        // color per object
+        uint32 colorAlign = Align(sizeof(ColorBlock), alignment);
+        m_ColorDatas.resize(colorAlign * m_Model->meshes.size());
+        for (int32 i = 0; i < m_Model->meshes.size(); ++i)
+        {
+            float r = MMath::RandRange(0.0f, 1.0f);
+            float g = MMath::RandRange(0.0f, 1.0f);
+            float b = MMath::RandRange(0.0f, 1.0f);
+            ColorBlock* colorBlock = (ColorBlock*)(m_ColorDatas.data() + colorAlign * i);
+            colorBlock->color.Set(r, g, b, 1.0f);
+        }
+        m_ColorBuffer = vk_demo::DVKBuffer::CreateBuffer(
+            m_VulkanDevice,
+            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            m_ColorDatas.size(),
+            m_ColorDatas.data()
+        );
+        m_ColorBuffer->Map();
 
-        // m_ParamBuffer = vk_demo::DVKBuffer::CreateBuffer(
-        //     m_VulkanDevice,
-        //     VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-        //     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        //     sizeof(ParamBlock),
-        //     &(m_ParamData)
-        // );
-        // m_ParamBuffer->Map();
+        for (int32 i = 0; i < m_Model->meshes.size(); ++i)
+        {
+            m_MeshNames.push_back(m_Model->meshes[i]->linkNode->name.c_str());
+        }
     }
 
     void DestroyUniformBuffers()
     {
-         m_ViewProjBuffer->UnMap();
+        m_ViewProjBuffer->UnMap();
         delete m_ViewProjBuffer;
+        m_ViewProjBuffer = nullptr;
 
-        // m_ParamBuffer->UnMap();
-        // delete m_ParamBuffer;
+        m_ModelBuffer->UnMap();
+        delete m_ModelBuffer;
+        m_ModelBuffer = nullptr;
+
+        m_ColorBuffer->UnMap();
+        delete m_ColorBuffer;
+        m_ColorBuffer = nullptr;
     }
 
 
@@ -439,7 +513,7 @@ private:
     {
         vk_demo::DVKCommandBuffer* cmdBuffer = vk_demo::DVKCommandBuffer::Create(m_VulkanDevice,m_CommandPool);
         
-          m_Model = vk_demo::DVKModel::LoadFromFile(
+         m_Model = vk_demo::DVKModel::LoadFromFile(
             "assets/models/Room/miniHouse_FBX.FBX",
             m_VulkanDevice,
             cmdBuffer,
@@ -455,27 +529,25 @@ private:
     }
 
 private:
-
-    typedef std::vector<vk_demo::DVKGfxPipeline*>   DVKPipelines;
-
     bool                            m_AutoRotate = false;
     bool                            m_Ready = false;
 
     vk_demo::DVKCamera              m_ViewCamera;
 
-   
-    ViewProjectionBlock             m_ViewProjData;
+    std::vector<uint8>              m_ModelDatas;
+    vk_demo::DVKBuffer*             m_ModelBuffer = nullptr;
+
     vk_demo::DVKBuffer*             m_ViewProjBuffer = nullptr;
+    ViewProjectionBlock             m_ViewProjData;
 
-    // ParamBlock                      m_ParamData;
-    // vk_demo::DVKBuffer*             m_ParamBuffer = nullptr;
+    std::vector<uint8>              m_ColorDatas;
+    vk_demo::DVKBuffer*             m_ColorBuffer = nullptr;
 
-    vk_demo::DVKTexture*            m_TexDiffuse = nullptr;
-    vk_demo::DVKTexture*            m_TexNormal = nullptr;
-    vk_demo::DVKTexture*            m_TexCurvature = nullptr;
-    vk_demo::DVKTexture*            m_TexPreIntegrated = nullptr;
+    std::vector<const char*>        m_MeshNames;
+    int32                           m_Selected = 0;
+    float                           m_GlobalAlpha = 1.0f;
 
-    DVKPipelines                    m_Pipelines;
+    vk_demo::DVKGfxPipeline*        m_Pipeline = nullptr;
 
     vk_demo::DVKModel*              m_Model = nullptr;
 
