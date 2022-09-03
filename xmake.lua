@@ -22,7 +22,7 @@ target("imgui")
 target_end()
 
 
-package("myassimp")
+package("assimp")
     add_deps("cmake")
     set_sourcedir(path.join("$(projectdir)","external", "assimp"))
     on_install(function (package)
@@ -34,14 +34,26 @@ package("myassimp")
 package_end()
 
 
-add_requires("myassimp")
+package("SPIRV-Cross")
+    add_deps("cmake")
+    set_sourcedir(path.join("$(projectdir)","external", "SPIRV-Cross"))
+    on_install(function (package)
+        local configs = {}
+        table.insert(configs, "-DCMAKE_BUILD_TYPE=" .. (package:debug() and "Debug" or "Release"))
+        table.insert(configs, "-DBUILD_SHARED_LIBS=" .. (package:config("shared") and "ON" or "OFF"))
+        import("package.tools.cmake").install(package, configs)
+    end)
+package_end()
+
+add_requires("assimp")
+add_requires("SPIRV-Cross")
 
 target("Vulkan")
     set_kind("static")
-    add_files("./src/Engine/**.cpp")
+    add_files("./src/Engine/**.cpp","./src/Engine/**.cpp")
     add_includedirs(include_dir_list, "$(projectdir)/src/Engine")
     add_deps("imgui")
-    add_packages("myassimp")
+    add_packages("assimp","SPIRV-Cross")
     add_links(links_list,"$(projectdir)/external/vulkan/windows/lib/vulkan-1")
         --copy resource file to build directory
 target_end()

@@ -1,4 +1,4 @@
-target("15_Texture3D")
+target("16_OptimizeShaderAndLayout")
 set_kind("binary")
 add_files("/*.cpp","../LaunchWindows.cpp")
 add_links(links_list)

@@ -2,6 +2,7 @@
 #include "Common/Log.h"
 
 #include "Demo/DVKIndexBuffer.h"
+#include "Demo/DVKShader.h"
 #include "Demo/DVKVertexBuffer.h"
 #include "Demo/DemoBase.h"
 #include "Demo/DVKBuffer.h"
@@ -21,16 +22,16 @@
 #include "imgui.h"
 #include "vulkan/vulkan_core.h"
 
-class TextureArrayModule : public DemoBase
+class OptimizeShaderAndLayoutModuleDemo : public DemoBase
 {
 public:
-    TextureArrayModule(int32 width, int32 height, const char* title, const std::vector<std::string>& cmdLine)
+    OptimizeShaderAndLayoutModuleDemo(int32 width, int32 height, const char* title, const std::vector<std::string>& cmdLine)
         : DemoBase(width, height, title, cmdLine)
     {
 
     }
 
-    virtual ~TextureArrayModule()
+    virtual ~OptimizeShaderAndLayoutModuleDemo()
     {
 
     }
@@ -52,7 +53,7 @@ public:
         CreateUniformBuffers();
        // CreateDescriptorPool();
    
-        CreateDescriptorSetLayout();
+       // CreateDescriptorSetLayout();
         CreateDescriptorSet();
         CreatePipelines();
         SetupCommandBuffers();
@@ -68,7 +69,7 @@ public:
 
         DestroyAssets();
         DestroyGUI();
-        DestroyDescriptorSetLayout();
+      //  DestroyDescriptorSetLayout();
         DestroyPipelines();
         DestroyUniformBuffers();
 
@@ -219,7 +220,7 @@ private:
             vkCmdSetViewport(m_CommandBuffers[i], 0, 1, &viewport);
             vkCmdSetScissor(m_CommandBuffers[i], 0, 1, &scissor);
             vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline0->pipeline);
-            vkCmdBindDescriptorSets(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline0->pipelineLayout, 0, 1, &m_DescriptorSet0, 0, nullptr);
+            vkCmdBindDescriptorSets(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline0->pipelineLayout, 0, m_DescriptorSet0->descriptorSets.size(), m_DescriptorSet0->descriptorSets.data(), 0, nullptr);
             for (int32 meshIndex = 0; meshIndex < m_Model->meshes.size(); ++meshIndex)
             {
                 m_Model->meshes[meshIndex]->BindDrawCmd(m_CommandBuffers[i]);
@@ -234,7 +235,7 @@ private:
             vkCmdSetViewport(m_CommandBuffers[i], 0, 1, &viewport);
             vkCmdSetScissor(m_CommandBuffers[i], 0, 1, &scissor);
             vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline1->pipeline);
-            vkCmdBindDescriptorSets(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline1->pipelineLayout, 0, 1, &m_DescriptorSet1, 0, nullptr);
+            vkCmdBindDescriptorSets(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline1->pipelineLayout, 0, m_DescriptorSet1->descriptorSets.size(), m_DescriptorSet1->descriptorSets.data(), 0, nullptr);
             for (int32 meshIndex = 0; meshIndex < m_Model->meshes.size(); ++meshIndex)
             {
                 m_Model->meshes[meshIndex]->BindDrawCmd(m_CommandBuffers[i]);
@@ -248,7 +249,7 @@ private:
             vkCmdSetViewport(m_CommandBuffers[i], 0, 1, &viewport);
             vkCmdSetScissor(m_CommandBuffers[i], 0, 1, &scissor);
             vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline2->pipeline);
-            vkCmdBindDescriptorSets(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline2->pipelineLayout, 0, 1, &m_DescriptorSet2, 0, nullptr);
+           vkCmdBindDescriptorSets(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline2->pipelineLayout, 0, m_DescriptorSet2->descriptorSets.size(), m_DescriptorSet2->descriptorSets.data(), 0, nullptr);
             for (int32 meshIndex = 0; meshIndex < m_Model->meshes.size(); ++meshIndex)
             {
                 m_Model->meshes[meshIndex]->BindDrawCmd(m_CommandBuffers[i]);
@@ -262,7 +263,7 @@ private:
             vkCmdSetViewport(m_CommandBuffers[i], 0, 1, &viewport);
             vkCmdSetScissor(m_CommandBuffers[i], 0, 1, &scissor);
             vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline3->pipeline);
-            vkCmdBindDescriptorSets(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline3->pipelineLayout, 0, 1, &m_DescriptorSet3, 0, nullptr);
+            vkCmdBindDescriptorSets(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Pipeline3->pipelineLayout, 0, m_DescriptorSet2->descriptorSets.size(), m_DescriptorSet3->descriptorSets.data(), 0, nullptr);
             for (int32 meshIndex = 0; meshIndex < m_Model->meshes.size(); ++meshIndex)
             {
                 m_Model->meshes[meshIndex]->BindDrawCmd(m_CommandBuffers[i]);
@@ -277,79 +278,27 @@ private:
 
     void CreateDescriptorSet()
     {
-        VkDescriptorPoolSize poolSizes[2];
-        poolSizes[0].type            = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        poolSizes[0].descriptorCount = 2 * 4;
-        poolSizes[1].type            = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        poolSizes[1].descriptorCount = 2 * 4;
+         m_DescriptorSet0 = m_ShaderTexture->AllocateDescriptorSet();
+         m_DescriptorSet0->WriteBuffer("uboMVP", m_MVPBuffer); 
+         m_DescriptorSet0->WriteImage("diffuseMap", m_TexOrigin);
 
+        m_DescriptorSet1 = m_ShaderLut->AllocateDescriptorSet();
+        m_DescriptorSet1->WriteBuffer("uboMVP", m_MVPBuffer);
+        m_DescriptorSet1->WriteImage("diffuseMap", m_TexOrigin);
+        m_DescriptorSet1->WriteImage("lutMap", m_Tex3DLut);
 
+        m_DescriptorSet2 = m_ShaderLutDebug0->AllocateDescriptorSet();
+        m_DescriptorSet2->WriteBuffer("uboMVP", m_MVPBuffer);
+        m_DescriptorSet2->WriteImage("diffuseMap", m_TexOrigin);
+        m_DescriptorSet2->WriteImage("lutMap", m_Tex3DLut);
+        m_DescriptorSet2->WriteBuffer("uboLutDebug", m_LutDebugBuffer);
 
-        VkDescriptorPoolCreateInfo descriptorPoolInfo;
-        ZeroVulkanStruct(descriptorPoolInfo, VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO);
-        descriptorPoolInfo.poolSizeCount = 2;
-        descriptorPoolInfo.pPoolSizes    = poolSizes;
-        descriptorPoolInfo.maxSets       = 4;
-        VERIFYVULKANRESULT(vkCreateDescriptorPool(m_Device, &descriptorPoolInfo, VULKAN_CPU_ALLOCATOR, &m_DescriptorPool));
+        m_DescriptorSet3 = m_ShaderLutDebug1->AllocateDescriptorSet();
+        m_DescriptorSet3->WriteBuffer("uboMVP", m_MVPBuffer);
+        m_DescriptorSet3->WriteImage("diffuseMap", m_TexOrigin);
+        m_DescriptorSet3->WriteImage("lutMap", m_Tex3DLut);
+        m_DescriptorSet3->WriteBuffer("uboLutDebug", m_LutDebugBuffer);
 
-
-        std::vector<VkDescriptorSet*> descriptorSets = {
-            &m_DescriptorSet0,
-            &m_DescriptorSet1,
-            &m_DescriptorSet2,
-            &m_DescriptorSet3
-        };
-        std::vector<vk_demo::DVKTexture*> textures = {
-            m_TexOrigin,
-            m_TexOrigin,
-            m_TexOrigin,
-            m_TexOrigin
-        };
-
-        for (int32 i = 0; i < descriptorSets.size(); ++i)
-        {
-            VkDescriptorSetAllocateInfo allocInfo;
-            ZeroVulkanStruct(allocInfo, VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO);
-            allocInfo.descriptorPool     = m_DescriptorPool;
-            allocInfo.descriptorSetCount = 1;
-            allocInfo.pSetLayouts        = &m_DescriptorSetLayout;
-            VERIFYVULKANRESULT(vkAllocateDescriptorSets(m_Device, &allocInfo, descriptorSets[i]));
-
-            VkWriteDescriptorSet writeDescriptorSet;
-            ZeroVulkanStruct(writeDescriptorSet, VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
-            writeDescriptorSet.dstSet          = *(descriptorSets[i]);
-            writeDescriptorSet.descriptorCount = 1;
-            writeDescriptorSet.descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            writeDescriptorSet.pBufferInfo     = &(m_MVPBuffer->descriptor);
-            writeDescriptorSet.dstBinding      = 0;
-            vkUpdateDescriptorSets(m_Device, 1, &writeDescriptorSet, 0, nullptr);
-
-            ZeroVulkanStruct(writeDescriptorSet, VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
-            writeDescriptorSet.dstSet          = *(descriptorSets[i]);
-            writeDescriptorSet.descriptorCount = 1;
-            writeDescriptorSet.descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            writeDescriptorSet.pBufferInfo     = nullptr;
-            writeDescriptorSet.pImageInfo      = &(textures[i]->descriptorInfo);
-            writeDescriptorSet.dstBinding      = 1;
-            vkUpdateDescriptorSets(m_Device, 1, &writeDescriptorSet, 0, nullptr);
-
-            ZeroVulkanStruct(writeDescriptorSet, VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
-            writeDescriptorSet.dstSet          = *(descriptorSets[i]);
-            writeDescriptorSet.descriptorCount = 1;
-            writeDescriptorSet.descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            writeDescriptorSet.pBufferInfo     = nullptr;
-            writeDescriptorSet.pImageInfo      = &(m_Tex3DLut->descriptorInfo);
-            writeDescriptorSet.dstBinding      = 2;
-            vkUpdateDescriptorSets(m_Device, 1, &writeDescriptorSet, 0, nullptr);
-
-            ZeroVulkanStruct(writeDescriptorSet, VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET);
-            writeDescriptorSet.dstSet          = *(descriptorSets[i]);
-            writeDescriptorSet.descriptorCount = 1;
-            writeDescriptorSet.descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            writeDescriptorSet.pBufferInfo     = &(m_LutDebugBuffer->descriptor);
-            writeDescriptorSet.dstBinding      = 3;
-            vkUpdateDescriptorSets(m_Device, 1, &writeDescriptorSet, 0, nullptr);
-        }
     }
 
 
@@ -362,36 +311,21 @@ private:
         std::vector<VkVertexInputAttributeDescription> vertexInputAttributs = m_Model->GetInputAttributes();
 
         vk_demo::DVKGfxPipelineInfo pipelineInfo0;
-        pipelineInfo0.vertShaderModule = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/15_Texture3D/texture.vert.spv");
-        pipelineInfo0.fragShaderModule = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/15_Texture3D/texture.frag.spv");
-        m_Pipeline0 = vk_demo::DVKGfxPipeline::Create(m_VulkanDevice, m_PipelineCache, pipelineInfo0, { vertexInputBinding }, vertexInputAttributs, m_PipelineLayout, m_RenderPass);
+        pipelineInfo0.shader = m_ShaderTexture;
+        m_Pipeline0 = vk_demo::DVKGfxPipeline::Create(m_VulkanDevice, m_PipelineCache, pipelineInfo0, { vertexInputBinding }, vertexInputAttributs, m_ShaderTexture->pipelineLayout, m_RenderPass);
 
         vk_demo::DVKGfxPipelineInfo pipelineInfo1;
-        pipelineInfo1.vertShaderModule = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/15_Texture3D/lut.vert.spv");
-        pipelineInfo1.fragShaderModule = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/15_Texture3D/lut.frag.spv");
-        m_Pipeline1 = vk_demo::DVKGfxPipeline::Create(m_VulkanDevice, m_PipelineCache, pipelineInfo1, { vertexInputBinding }, vertexInputAttributs, m_PipelineLayout, m_RenderPass);
+        pipelineInfo1.shader = m_ShaderLut;
+        m_Pipeline1 = vk_demo::DVKGfxPipeline::Create(m_VulkanDevice, m_PipelineCache, pipelineInfo1, { vertexInputBinding }, vertexInputAttributs, m_ShaderLut->pipelineLayout, m_RenderPass);
 
         vk_demo::DVKGfxPipelineInfo pipelineInfo2;
-        pipelineInfo2.vertShaderModule = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/15_Texture3D/debug0.vert.spv");
-        pipelineInfo2.fragShaderModule = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/15_Texture3D/debug0.frag.spv");
-        m_Pipeline2 = vk_demo::DVKGfxPipeline::Create(m_VulkanDevice, m_PipelineCache, pipelineInfo2, { vertexInputBinding }, vertexInputAttributs, m_PipelineLayout, m_RenderPass);
+        pipelineInfo2.shader = m_ShaderLutDebug0;
+        m_Pipeline2 = vk_demo::DVKGfxPipeline::Create(m_VulkanDevice, m_PipelineCache, pipelineInfo2, { vertexInputBinding }, vertexInputAttributs, m_ShaderLutDebug0->pipelineLayout, m_RenderPass);
 
         vk_demo::DVKGfxPipelineInfo pipelineInfo3;
-        pipelineInfo3.vertShaderModule = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/15_Texture3D/debug1.vert.spv");
-        pipelineInfo3.fragShaderModule = vk_demo::LoadSPIPVShader(m_Device, "assets/shaders/15_Texture3D/debug1.frag.spv");
-        m_Pipeline3 = vk_demo::DVKGfxPipeline::Create(m_VulkanDevice, m_PipelineCache, pipelineInfo3, { vertexInputBinding }, vertexInputAttributs, m_PipelineLayout, m_RenderPass);
+        pipelineInfo3.shader = m_ShaderLutDebug1;
+        m_Pipeline3 = vk_demo::DVKGfxPipeline::Create(m_VulkanDevice, m_PipelineCache, pipelineInfo3, { vertexInputBinding }, vertexInputAttributs, m_ShaderLutDebug1->pipelineLayout, m_RenderPass);
 
-        vkDestroyShaderModule(m_Device, pipelineInfo0.vertShaderModule, VULKAN_CPU_ALLOCATOR);
-        vkDestroyShaderModule(m_Device, pipelineInfo0.fragShaderModule, VULKAN_CPU_ALLOCATOR);
-
-        vkDestroyShaderModule(m_Device, pipelineInfo1.vertShaderModule, VULKAN_CPU_ALLOCATOR);
-        vkDestroyShaderModule(m_Device, pipelineInfo1.fragShaderModule, VULKAN_CPU_ALLOCATOR);
-
-        vkDestroyShaderModule(m_Device, pipelineInfo2.vertShaderModule, VULKAN_CPU_ALLOCATOR);
-        vkDestroyShaderModule(m_Device, pipelineInfo2.fragShaderModule, VULKAN_CPU_ALLOCATOR);
-
-        vkDestroyShaderModule(m_Device, pipelineInfo3.vertShaderModule, VULKAN_CPU_ALLOCATOR);
-        vkDestroyShaderModule(m_Device, pipelineInfo3.fragShaderModule, VULKAN_CPU_ALLOCATOR);
     }
 
     void DestroyPipelines()
@@ -400,6 +334,11 @@ private:
         delete m_Pipeline1;
         delete m_Pipeline2;
         delete m_Pipeline3;
+
+        delete m_DescriptorSet0;
+        delete m_DescriptorSet1;
+        delete m_DescriptorSet2;
+        delete m_DescriptorSet3;
     }
 
     void CreateDescriptorSetLayout()
@@ -518,6 +457,25 @@ private:
 
     void LoadAssets()
     {
+        m_ShaderTexture = vk_demo::DVKShader::Create( m_VulkanDevice,
+            "assets/shaders/16_OptimizeShaderAndLayout/texture.vert.spv",
+            "assets/shaders/16_OptimizeShaderAndLayout/texture.frag.spv");
+        m_ShaderLut = vk_demo::DVKShader::Create(
+            m_VulkanDevice,
+            "assets/shaders/16_OptimizeShaderAndLayout/lut.vert.spv",
+            "assets/shaders/16_OptimizeShaderAndLayout/lut.frag.spv"
+        );
+        m_ShaderLutDebug0 = vk_demo::DVKShader::Create(
+            m_VulkanDevice,
+            "assets/shaders/16_OptimizeShaderAndLayout/debug0.vert.spv",
+            "assets/shaders/16_OptimizeShaderAndLayout/debug0.frag.spv"
+        );
+        m_ShaderLutDebug1 = vk_demo::DVKShader::Create(
+            m_VulkanDevice,
+            "assets/shaders/16_OptimizeShaderAndLayout/debug1.vert.spv",
+            "assets/shaders/16_OptimizeShaderAndLayout/debug1.frag.spv"
+        );
+
         vk_demo::DVKCommandBuffer* cmdBuffer = vk_demo::DVKCommandBuffer::Create(m_VulkanDevice,m_CommandPool);
         m_Model = vk_demo::DVKModel::LoadFromFile(
             "assets/models/plane_z.obj",
@@ -564,6 +522,12 @@ private:
         delete m_Model;
         delete m_TexOrigin;
         delete m_Tex3DLut;
+
+
+        delete m_ShaderTexture;
+        delete m_ShaderLut;
+        delete m_ShaderLutDebug0;
+        delete m_ShaderLutDebug1;
     }
 
 private:
@@ -585,6 +549,11 @@ private:
     vk_demo::DVKGfxPipeline*        m_Pipeline2 = nullptr;
     vk_demo::DVKGfxPipeline*        m_Pipeline3 = nullptr;
 
+    vk_demo::DVKShader*             m_ShaderTexture = nullptr;
+    vk_demo::DVKShader*             m_ShaderLut = nullptr;
+    vk_demo::DVKShader*             m_ShaderLutDebug0 = nullptr;
+    vk_demo::DVKShader*             m_ShaderLutDebug1= nullptr;
+
     vk_demo::DVKModel*              m_Model = nullptr;
 
     VkDescriptorPool                m_DescriptorPool = VK_NULL_HANDLE;
@@ -592,15 +561,15 @@ private:
     VkDescriptorSetLayout           m_DescriptorSetLayout = VK_NULL_HANDLE;
     VkPipelineLayout                m_PipelineLayout = VK_NULL_HANDLE;
 
-    VkDescriptorSet                 m_DescriptorSet0 = VK_NULL_HANDLE;
-    VkDescriptorSet                 m_DescriptorSet1 = VK_NULL_HANDLE;
-    VkDescriptorSet                 m_DescriptorSet2 = VK_NULL_HANDLE;
-    VkDescriptorSet                 m_DescriptorSet3 = VK_NULL_HANDLE;
+    vk_demo::DVKDescriptorSet*      m_DescriptorSet0 = nullptr;
+    vk_demo::DVKDescriptorSet*      m_DescriptorSet1 = nullptr;
+    vk_demo::DVKDescriptorSet*      m_DescriptorSet2 = nullptr;
+    vk_demo::DVKDescriptorSet*      m_DescriptorSet3 = nullptr;
 
     ImageGUIContext*                m_GUI = nullptr;
 };
 
 std::shared_ptr<AppModuleBase> CreateAppMode(const std::vector<std::string>& cmdLine)
 {
-    return std::make_shared<TextureArrayModule>(1400, 900, "Texture3D", cmdLine);
+    return std::make_shared<OptimizeShaderAndLayoutModuleDemo>(1400, 900, "OptimizeShaderAndLayoutModuleDemo", cmdLine);
 }
