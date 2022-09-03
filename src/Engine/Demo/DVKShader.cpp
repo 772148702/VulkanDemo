@@ -79,13 +79,13 @@ namespace vk_demo
     
     void DVKShader::ProcessAttachments(spirv_cross::Compiler& compiler, spirv_cross::ShaderResources& resources, VkPipelineStageFlags stageFlags)
     {
-         // 获取attachment信息
+        // 获取attachment信息
         for (int32 i = 0; i < resources.subpass_inputs.size(); ++i)
         {
-            spirv_cross::Resource& res      = resources.storage_images[i];
+            spirv_cross::Resource& res      = resources.subpass_inputs[i];
             spirv_cross::SPIRType type      = compiler.get_type(res.type_id);
             spirv_cross::SPIRType base_type = compiler.get_type(res.base_type_id);
-            const std::string&      varName = compiler.get_name(res.id);
+            const std::string &varName      = compiler.get_name(res.id);
 
             int32 set     = compiler.get_decoration(res.id, spv::DecorationDescriptorSet);
             int32 binding = compiler.get_decoration(res.id, spv::DecorationBinding);
@@ -98,7 +98,7 @@ namespace vk_demo
             setLayoutBinding.pImmutableSamplers = nullptr;
 
             setLayoutsInfo.AddDescriptorSetLayoutBinding(varName, set, setLayoutBinding);
-            
+
             auto it = imageParams.find(varName);
             if (it == imageParams.end())
             {
@@ -113,6 +113,7 @@ namespace vk_demo
             {
                 it->second.stageFlags |= stageFlags;
             }
+
         }
     }
 
