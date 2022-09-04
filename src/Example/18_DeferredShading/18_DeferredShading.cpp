@@ -75,7 +75,7 @@ public:
       
         DestroyPipelines();
         DestroyUniformBuffers();
-
+        DestroyAttachments();
     }
 
     virtual void Loop(float time, float delta) override
@@ -217,7 +217,7 @@ private:
         VkRenderPassBeginInfo renderPassBeginInfo;
         ZeroVulkanStruct(renderPassBeginInfo, VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO);
         renderPassBeginInfo.renderPass      = m_RenderPass;
-        renderPassBeginInfo.clearValueCount = 4;
+        renderPassBeginInfo.clearValueCount = 5;
         renderPassBeginInfo.pClearValues    = clearValues;
         renderPassBeginInfo.renderArea.offset.x = 0;
         renderPassBeginInfo.renderArea.offset.y = 0;
@@ -804,6 +804,9 @@ private:
         delete m_Shader0;
         delete m_Shader1;
     }
+
+
+
 
 private:
     typedef std::vector<vk_demo::DVKDescriptorSet*>     DVKDescriptorSetArray;
